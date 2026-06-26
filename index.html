@@ -906,6 +906,132 @@ let currentPage = { clubs: 1, noligue: 1 };
 let sortState = { clubs: null, leagues: null, nations: null, noligue: null };
 let filteredData = { clubs: [], leagues: [], nations: [], noligue: [] };
 
+// ============ OPTIMIZACIÓN: CACHE DE SELECTORES DOM ============
+const DOM_CACHE = {};
+const $ = (selector) => {
+  if (!DOM_CACHE[selector]) {
+    DOM_CACHE[selector] = document.querySelector(selector);
+  }
+  return DOM_CACHE[selector];
+};
+
+// ============ OPTIMIZACIÓN: DEBOUNCE PARA BÚSQUEDAS ============
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// ============ OPTIMIZACIÓN: THROTTLE PARA SCROLL ============
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+// ============ OPTIMIZACIÓN: HIGHLIGHT CON CACHE ============
+const highlightCache = new Map();
+function highlightText(text, query) {
+  if (!query) return text;
+  const cacheKey = `${text}|${query}`;
+  if (highlightCache.has(cacheKey)) {
+    return highlightCache.get(cacheKey);
+  }
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
+  const result = String(text).replace(regex, '<span class="highlight">$1</span>');
+  highlightCache.set(cacheKey, result);
+  return result;
+}
+
+// ============ OPTIMIZACIÓN: ÍNDICES PARA BÚSQUEDA RÁPIDA ============
+const searchIndex = {
+  clubs: { name: new Map(), country: new Map(), league: new Map() },
+  leagues: { country: new Map(), name: new Map() },
+  nations: { name: new Map(), continent: new Map() },
+  noligue: { name: new Map(), country: new Map() }
+};
+
+function buildSearchIndexes() {
+  // Índice de clubes
+  clubsData.forEach((c, idx) => {
+    const nameLower = c[1].toLowerCase();
+    const shortLower = c[2].toLowerCase();
+    if (!searchIndex.clubs.name.has(nameLower.charAt(0))) {
+      searchIndex.clubs.name.set(nameLower.charAt(0), []);
+    }
+    searchIndex.clubs.name.get(nameLower.charAt(0)).push(idx);
+    
+    if (!searchIndex.clubs.country.has(c[4])) {
+      searchIndex.clubs.country.set(c[4], []);
+    }
+    searchIndex.clubs.country.get(c[4]).push(idx);
+    
+    if (!searchIndex.clubs.league.has(c[5])) {
+      searchIndex.clubs.league.set(c[5], []);
+    }
+    searchIndex.clubs.league.get(c[5]).push(idx);
+  });
+  
+  // Índice de ligas
+  leaguesData.forEach((l, idx) => {
+    const countryLower = l[1].toLowerCase();
+    const nameLower = l[2].toLowerCase();
+    
+    if (!searchIndex.leagues.country.has(l[1])) {
+      searchIndex.leagues.country.set(l[1], []);
+    }
+    searchIndex.leagues.country.get(l[1]).push(idx);
+    
+    if (!searchIndex.leagues.name.has(nameLower.charAt(0))) {
+      searchIndex.leagues.name.set(nameLower.charAt(0), []);
+    }
+    searchIndex.leagues.name.get(nameLower.charAt(0)).push(idx);
+  });
+  
+  // Índice de naciones
+  nationsData.forEach((n, idx) => {
+    const nameLower = n[1].toLowerCase();
+    
+    if (!searchIndex.nations.name.has(nameLower.charAt(0))) {
+      searchIndex.nations.name.set(nameLower.charAt(0), []);
+    }
+    searchIndex.nations.name.get(nameLower.charAt(0)).push(idx);
+    
+    if (!searchIndex.nations.continent.has(n[3])) {
+      searchIndex.nations.continent.set(n[3], []);
+    }
+    searchIndex.nations.continent.get(n[3]).push(idx);
+  });
+  
+  // Índice de noligue
+  noligueData.forEach((n, idx) => {
+    const nameLower = n[1].toLowerCase();
+    const shortLower = n[2].toLowerCase();
+    
+    if (!searchIndex.noligue.name.has(nameLower.charAt(0))) {
+      searchIndex.noligue.name.set(nameLower.charAt(0), []);
+    }
+    searchIndex.noligue.name.get(nameLower.charAt(0)).push(idx);
+    
+    if (!searchIndex.noligue.country.has(n[4])) {
+      searchIndex.noligue.country.set(n[4], []);
+    }
+    searchIndex.noligue.country.get(n[4]).push(idx);
+  });
+}
+
 function getRankClass(r) {
   if (r === 1) return 'rank-1';
   if (r === 2) return 'rank-2';
@@ -918,46 +1044,56 @@ function showTab(tab) {
     b.classList.toggle('active', b.getAttribute('onclick').includes(tab));
   });
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + tab).classList.add('active');
-}
-
-function highlightText(text, query) {
-  if (!query) return text;
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return String(text).replace(regex, '<span class="highlight">$1</span>');
-}
-
-// ============ BÚSQUEDA GLOBAL ============
-document.getElementById('global-search').addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase().trim();
-  const results = document.getElementById('global-results');
+const panelCache = {};
   
-  if (!q) { results.classList.remove('active'); return; }
+  if (!panelCache[tab]) {
+    panelCache[tab] = document.getElementById('panel-' + tab);
+  }
+  panelCache[tab].classList.add('active');
+}
+
+// ============ BÚSQUEDA GLOBAL OPTIMIZADA CON DEBOUNCE ============
+const globalSearchInput = document.getElementById('global-search');
+const globalResults = document.getElementById('global-results');
+
+function performGlobalSearch(q) {
+  if (!q) { 
+    globalResults.classList.remove('active'); 
+    return; 
+  }
   
   const allResults = [];
+  const qLower = q.toLowerCase();
   
-  clubsData.forEach(c => {
-    if (c[1].toLowerCase().includes(q) || c[2].toLowerCase().includes(q)) {
-      allResults.push({type:'club', data:c});
-    }
-  });
+  // Búsqueda en clubes usando índice
+  const firstChar = qLower.charAt(0);
+  if (searchIndex.clubs.name.has(firstChar)) {
+    searchIndex.clubs.name.get(firstChar).forEach(idx => {
+      const c = clubsData[idx];
+      if (c[1].toLowerCase().includes(qLower) || c[2].toLowerCase().includes(qLower)) {
+        allResults.push({type:'club', data:c});
+      }
+    });
+  }
   
+  // Búsqueda en ligas
   leaguesData.forEach(l => {
-    if (l[1].toLowerCase().includes(q) || l[2].toLowerCase().includes(q)) {
+    if (l[1].toLowerCase().includes(qLower) || l[2].toLowerCase().includes(qLower)) {
       allResults.push({type:'liga', data:l});
     }
   });
   
+  // Búsqueda en naciones
   nationsData.forEach(n => {
-    if (n[1].toLowerCase().includes(q)) {
+    if (n[1].toLowerCase().includes(qLower)) {
       allResults.push({type:'seleccion', data:n});
     }
   });
   
   if (allResults.length === 0) {
-    results.innerHTML = '<div class="global-result-item">🔍 No se encontraron resultados</div>';
+    globalResults.innerHTML = '<div class="global-result-item">🔍 No se encontraron resultados</div>';
   } else {
-    results.innerHTML = allResults.slice(0, 15).map(r => {
+    globalResults.innerHTML = allResults.slice(0, 15).map(r => {
       const d = r.data;
       let html = `<span class="country-flag">${getFlag(d[4]||d[1])}</span>`;
       
@@ -976,7 +1112,13 @@ document.getElementById('global-search').addEventListener('input', (e) => {
     }).join('');
   }
   
-  results.classList.add('active');
+  globalResults.classList.add('active');
+}
+
+// Aplicar debounce a la búsqueda global (150ms delay)
+const debouncedGlobalSearch = debounce(performGlobalSearch, 150);
+globalSearchInput.addEventListener('input', (e) => {
+  debouncedGlobalSearch(e.target.value.toLowerCase().trim());
 });
 
 // ============ FILTROS CLUBES ============
@@ -1003,8 +1145,14 @@ function filterClubs() {
   renderClubs();
 }
 
+// Cache para elementos de tabla de clubes
+let clubsTbodyCache = null;
+
 function renderClubs() {
-  const tbody = document.getElementById('tbody-clubs');
+  if (!clubsTbodyCache) {
+    clubsTbodyCache = document.getElementById('tbody-clubs');
+  }
+  const tbody = clubsTbodyCache;
   const start = (currentPage.clubs - 1) * PAGE_SIZE;
   const pageData = filteredData.clubs.slice(start, start + PAGE_SIZE);
   const q = document.getElementById('search-club').value;
@@ -1012,7 +1160,10 @@ function renderClubs() {
   if (pageData.length === 0) {
     tbody.innerHTML = '<tr><td colspan="8" class="no-results">🔍 No se encontraron clubes</td></tr>';
   } else {
-    tbody.innerHTML = pageData.map(c => `
+    // Usar DocumentFragment para mejor rendimiento
+    const fragment = document.createDocumentFragment();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = pageData.map(c => `
       <tr>
         <td class="rank-cell ${getRankClass(c[0])}">${c[0]}</td>
         <td><strong>${highlightText(c[1], q)}</strong></td>
@@ -1024,6 +1175,7 @@ function renderClubs() {
         <td><span class="strength-bar ${getStrengthClass(c[7])}">${c[7]}</span></td>
       </tr>
     `).join('');
+    tbody.innerHTML = tempDiv.innerHTML;
   }
   
   document.getElementById('clubs-info').textContent = 
@@ -1068,8 +1220,14 @@ function filterLeagues() {
   renderLeagues();
 }
 
+// Cache para elementos de tabla de ligas
+let leaguesTbodyCache = null;
+
 function renderLeagues() {
-  const tbody = document.getElementById('tbody-leagues');
+  if (!leaguesTbodyCache) {
+    leaguesTbodyCache = document.getElementById('tbody-leagues');
+  }
+  const tbody = leaguesTbodyCache;
   const q = document.getElementById('search-league').value;
   
   if (filteredData.leagues.length === 0) {
@@ -1111,8 +1269,14 @@ function filterNations() {
   renderNations();
 }
 
+// Cache para elementos de tabla de naciones
+let nationsTbodyCache = null;
+
 function renderNations() {
-  const tbody = document.getElementById('tbody-nations');
+  if (!nationsTbodyCache) {
+    nationsTbodyCache = document.getElementById('tbody-nations');
+  }
+  const tbody = nationsTbodyCache;
   const q = document.getElementById('search-nation').value;
   
   if (filteredData.nations.length === 0) {
@@ -1151,8 +1315,14 @@ function filterNoligue() {
   renderNoligue();
 }
 
+// Cache para elementos de tabla sin liga
+let noligueTbodyCache = null;
+
 function renderNoligue() {
-  const tbody = document.getElementById('tbody-noligue');
+  if (!noligueTbodyCache) {
+    noligueTbodyCache = document.getElementById('tbody-noligue');
+  }
+  const tbody = noligueTbodyCache;
   const start = (currentPage.noligue - 1) * PAGE_SIZE;
   const pageData = filteredData.noligue.slice(start, start + PAGE_SIZE);
   const q = document.getElementById('search-noligue').value;
@@ -1300,23 +1470,34 @@ function populateFilters() {
 }
 
 // Event listeners
-document.getElementById('search-club').addEventListener('input', filterClubs);
+// Optimización: Debounce para búsqueda de clubes (100ms)
+const debouncedFilterClubs = debounce(filterClubs, 100);
+document.getElementById('search-club').addEventListener('input', debouncedFilterClubs);
 document.getElementById('filter-country').addEventListener('change', filterClubs);
 document.getElementById('filter-league').addEventListener('change', filterClubs);
 document.getElementById('filter-level').addEventListener('change', filterClubs);
 document.getElementById('filter-strength').addEventListener('change', filterClubs);
-document.getElementById('search-league').addEventListener('input', filterLeagues);
+// Optimización: Debounce para búsqueda de ligas (100ms)
+const debouncedFilterLeagues = debounce(filterLeagues, 100);
+document.getElementById('search-league').addEventListener('input', debouncedFilterLeagues);
 document.getElementById('filter-league-country').addEventListener('change', filterLeagues);
 document.getElementById('filter-league-level').addEventListener('change', filterLeagues);
-document.getElementById('search-nation').addEventListener('input', filterNations);
+// Optimización: Debounce para búsqueda de naciones (100ms)
+const debouncedFilterNations = debounce(filterNations, 100);
+document.getElementById('search-nation').addEventListener('input', debouncedFilterNations);
 document.getElementById('filter-continent').addEventListener('change', filterNations);
 document.getElementById('filter-nation-strength').addEventListener('change', filterNations);
-document.getElementById('search-noligue').addEventListener('input', filterNoligue);
+// Optimización: Debounce para búsqueda sin liga (100ms)
+const debouncedFilterNoligue = debounce(filterNoligue, 100);
+document.getElementById('search-noligue').addEventListener('input', debouncedFilterNoligue);
 document.getElementById('filter-noligue-country').addEventListener('change', filterNoligue);
 document.getElementById('filter-noligue-strength').addEventListener('change', filterNoligue);
 
-// INIT
+// INIT OPTIMIZADO
 function init() {
+  // Construir índices de búsqueda para mejor rendimiento
+  buildSearchIndexes();
+  
   const argCount = clubsData.filter(c => c[4] === 'Argentina').length;
   document.getElementById('stat-clubs').textContent = clubsData.length;
   document.getElementById('stat-arg').textContent = argCount;
