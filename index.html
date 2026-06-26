@@ -713,12 +713,71 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .liga-row { grid-template-columns: 36px 1fr 60px; }
+  /* ── HEADER ── keep on one line, drop the version badge ── */
+  header { padding: 0 14px; }
+  .header-inner { gap: 8px; }
+  .logo { font-size: 20px; letter-spacing: 0.5px; }
+  .header-badge { display: none; }
+  .lang-select { font-size: 12px; padding: 7px 8px; }
+
+  /* ── HERO ── stats wrap into a 2×2 grid, no overflow ── */
+  .hero { padding: 20px 14px 18px; }
+  .hero-inner { gap: 14px; }
+  .hero-desc { font-size: 12.5px; max-width: none; }
+  .hero-stats { width: 100%; flex-wrap: wrap; }
+  .hero-stat { flex: 1 1 40%; min-width: 0; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+  .hero-stat:nth-child(2) { border-right: none; }
+  .hero-stat:nth-child(3), .hero-stat:nth-child(4) { border-bottom: none; }
+  .hero-stat .num { font-size: 22px; }
+
+  /* ── TABS ── horizontal scroll so all stay reachable ── */
+  .tabs { padding: 0 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { padding: 12px 12px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+
+  /* ── CONTENT / FILTERS ── tighter gutters ── */
+  .content { padding: 16px 12px; }
+  .search-wrap { flex: 1 1 100%; max-width: none; }
+  .filters select { flex: 1 1 45%; min-width: 0; }
+  .filter-count { margin-left: 0; width: 100%; }
+
+  /* ── CLUBS TABLE ── compact + scroll inside the card, never the page ── */
+  td.hide-mob, th.hide-mob { display: none; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #style-b { min-width: 540px; }
+  thead th { padding: 8px 10px; }
+  td { padding: 9px 10px; }
+  #style-b tbody td { padding: 10px 10px; }
+  .str-wrap { min-width: 70px; gap: 6px; }
+  .str-val { font-size: 18px; }
+
+  /* ── CARDS / GRIDS ── single column on small screens ── */
+  .cartas-grid { grid-template-columns: 1fr; }
+  .sel-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── LIGAS ── drop the secondary min-strength stat ── */
+  .liga-row { grid-template-columns: 36px 1fr 56px; padding: 12px 12px; gap: 10px; }
   .liga-row .stat-mini:last-child { display: none; }
-  td.hide-mob { display: none; }
-  .club-card { grid-template-columns: 30px 64px 1fr auto; }
-  .club-card .card-bar-col { display: none; }
-  .hero-stats { width: 100%; }
+
+  /* ── DETAIL OVERLAY ── full-width sheet, scrollable table ── */
+  .detail-overlay { padding: 0; align-items: stretch; }
+  .detail-panel { border-radius: 0; min-height: 100%; max-width: none; }
+  .detail-header { padding: 14px 16px; }
+  .detail-title { font-size: 22px; }
+  .detail-body { padding: 14px 16px; }
+  .detail-stat { padding: 9px 10px; min-width: 70px; }
+  .detail-stat .val { font-size: 19px; }
+  .detail-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .detail-table-wrap table { min-width: 420px; }
+
+  /* ── SHUFFLE / INFO ── tighter padding ── */
+  .shuffle-section { padding: 22px 18px 20px; }
+  .info-section h2 { font-size: 18px; }
+}
+
+@media (max-width: 380px) {
+  .sel-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 34px; }
 }
 </style>
 </head>
