@@ -651,6 +651,14 @@ td { padding: 10px 14px; vertical-align: middle; }
 .legend-text .range { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; }
 .legend-text .desc { font-size: 11px; color: var(--muted); }
 
+/* ── HORSE RACING SECTION ── */
+.race-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin-top: 12px; }
+.race-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
+.race-ico { font-size: 22px; line-height: 1; flex-shrink: 0; }
+.race-head { font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 3px; }
+.race-sub { font-size: 12px; color: var(--text2); line-height: 1.45; }
+.info-callout a { color: var(--accent); font-weight: 600; }
+
 /* ── FEEDBACK FORM ── */
 .fb-form { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .fb-row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -956,6 +964,18 @@ footer {
     </div>
 
     <div class="info-section">
+      <h2><span class="ico">🐎</span> <span data-i18n="info_horse_h">Carreras de caballos: ¿qué influye en ganar?</span></h2>
+      <p data-i18n="info_horse_p">Un miembro de la comunidad registró 235 carreras y les corrió una regresión estadística para medir cuánto influyen las estrellas del caballo y su energía en la posición final. Esto es lo que encontró:</p>
+      <div class="race-grid">
+        <div class="race-item"><div class="race-ico">⚡</div><div><div class="race-head" data-i18n="info_horse_energy_h">La energía es lo que más pesa</div><div class="race-sub" data-i18n="info_horse_energy_p">Correr descansado en vez de exhausto mejora la posición final en ~2,3 puestos. Cada 10% de energía ≈ 0,23 puestos.</div></div></div>
+        <div class="race-item"><div class="race-ico">⭐</div><div><div class="race-head" data-i18n="info_horse_star_h">Las estrellas ayudan (pero menos de lo que parece)</div><div class="race-sub" data-i18n="info_horse_star_p">Cada estrella mejora la posición final ~0,5 puestos. Un caballo 5★ termina ~2 puestos mejor que uno 1★, en promedio.</div></div></div>
+        <div class="race-item"><div class="race-ico">🎲</div><div><div class="race-head" data-i18n="info_horse_rng_h">Hay mucha suerte</div><div class="race-sub" data-i18n="info_horse_rng_p">El modelo explica solo ~25% del resultado (R²=0,25): el otro ~75% es azar (RNG).</div></div></div>
+        <div class="race-item"><div class="race-ico">👉</div><div><div class="race-head" data-i18n="info_horse_takeaway_h">En resumen</div><div class="race-sub" data-i18n="info_horse_takeaway_p">Corré siempre con el caballo descansado, invertí en estrellas si podés, pero aceptá que mucho queda en manos del azar.</div></div></div>
+      </div>
+      <div class="info-callout" data-i18n-html="info_horse_credit">📊 Análisis y datos por <strong>u/cvdb01</strong> en r/newstarsoccer — <a href="https://www.reddit.com/r/newstarsoccer/comments/1u8p8ir/horse_racing_effect_of_star_ratings_and_energy/" target="_blank" rel="noopener">ver el post original</a>. Es un hallazgo de la comunidad sobre una muestra de partidas, no un valor interno del juego.</div>
+    </div>
+
+    <div class="info-section">
       <h2><span class="ico">💬</span> <span data-i18n="info_fb_h">Mensajes, ideas y recomendaciones</span></h2>
       <p data-i18n="info_fb_p">¿Encontraste un error en los datos? ¿Tenés una idea para mejorar la wiki o algo que te gustaría ver? Dejame tu mensaje acá abajo. Toda sugerencia suma.</p>
       <form class="fb-form" id="fb-form" onsubmit="submitFeedback(event)">
@@ -1061,6 +1081,17 @@ const I18N = {
     info_tip3: "Hacé click en una <strong>selección</strong> para ver sus ligas, y desde ahí en cada liga para ver sus clubes",
     info_tip4: "En la pestaña de clubes podés elegir entre 2 vistas: Lista o Cartas",
     info_tip5: "En Clubes y Selecciones podés filtrar por <strong>Fuerza</strong> (Elite mundial, Muy fuerte, etc.) — se pueden combinar varias categorías",
+    info_horse_h: "Carreras de caballos: ¿qué influye en ganar?",
+    info_horse_p: "Un miembro de la comunidad registró 235 carreras y les corrió una regresión estadística para medir cuánto influyen las estrellas del caballo y su energía en la posición final. Esto es lo que encontró:",
+    info_horse_energy_h: "La energía es lo que más pesa",
+    info_horse_energy_p: "Correr descansado en vez de exhausto mejora la posición final en ~2,3 puestos. Cada 10% de energía ≈ 0,23 puestos.",
+    info_horse_star_h: "Las estrellas ayudan (pero menos de lo que parece)",
+    info_horse_star_p: "Cada estrella mejora la posición final ~0,5 puestos. Un caballo 5★ termina ~2 puestos mejor que uno 1★, en promedio.",
+    info_horse_rng_h: "Hay mucha suerte",
+    info_horse_rng_p: "El modelo explica solo ~25% del resultado (R²=0,25): el otro ~75% es azar (RNG).",
+    info_horse_takeaway_h: "En resumen",
+    info_horse_takeaway_p: "Corré siempre con el caballo descansado, invertí en estrellas si podés, pero aceptá que mucho queda en manos del azar.",
+    info_horse_credit: "📊 Análisis y datos por <strong>u/cvdb01</strong> en r/newstarsoccer — <a href=\"https://www.reddit.com/r/newstarsoccer/comments/1u8p8ir/horse_racing_effect_of_star_ratings_and_energy/\" target=\"_blank\" rel=\"noopener\">ver el post original</a>. Es un hallazgo de la comunidad sobre una muestra de partidas, no un valor interno del juego.",
     info_fb_h: "Mensajes, ideas y recomendaciones",
     info_fb_p: "¿Encontraste un error en los datos? ¿Tenés una idea para mejorar la wiki o algo que te gustaría ver? Dejame tu mensaje acá abajo. Toda sugerencia suma.",
     fb_name_label: "Nombre (opcional)", fb_name_ph: "Cómo te llamás", fb_type_label: "Tipo de mensaje",
@@ -1117,6 +1148,17 @@ const I18N = {
     info_tip3: "Click a <strong>national team</strong> to see its leagues, and from there each league to see its clubs",
     info_tip4: "In the clubs tab you can choose between 2 views: List or Cards",
     info_tip5: "In Clubs and National Teams you can filter by <strong>Strength</strong> (World elite, Very strong, etc.) — multiple categories can be combined",
+    info_horse_h: "Horse racing: what affects winning?",
+    info_horse_p: "A community member recorded 235 races and ran a statistical regression to measure how much a horse's star rating and energy affect its finishing position. Here's what they found:",
+    info_horse_energy_h: "Energy matters most",
+    info_horse_energy_p: "Racing rested instead of exhausted improves finishing position by ~2.3 places. Each 10% of energy ≈ 0.23 places.",
+    info_horse_star_h: "Stars help (but less than you'd think)",
+    info_horse_star_p: "Each star improves finishing position by ~0.5 places. A 5★ horse finishes ~2 places better than a 1★ one, on average.",
+    info_horse_rng_h: "There's a lot of luck",
+    info_horse_rng_p: "The model explains only ~25% of the outcome (R²=0.25): the other ~75% is randomness (RNG).",
+    info_horse_takeaway_h: "Bottom line",
+    info_horse_takeaway_p: "Always race with a rested horse, invest in stars if you can, but accept that a lot comes down to chance.",
+    info_horse_credit: "📊 Analysis and data by <strong>u/cvdb01</strong> on r/newstarsoccer — <a href=\"https://www.reddit.com/r/newstarsoccer/comments/1u8p8ir/horse_racing_effect_of_star_ratings_and_energy/\" target=\"_blank\" rel=\"noopener\">see the original post</a>. This is a community finding based on a sample of games, not an internal game value.",
     info_fb_h: "Messages, ideas and recommendations",
     info_fb_p: "Found an error in the data? Got an idea to improve the wiki or something you'd like to see? Leave your message below. Every suggestion helps.",
     fb_name_label: "Name (optional)", fb_name_ph: "Your name", fb_type_label: "Message type",
