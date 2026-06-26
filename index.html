@@ -56,6 +56,21 @@
   flex-shrink: 0;
 }
 .theme-toggle:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.lang-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 7px 10px;
+  height: 36px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.lang-select:hover { border-color: var(--accent); color: var(--accent); }
+.lang-select:focus { outline: none; border-color: var(--accent); }
 
 .str-elite {
   background: linear-gradient(90deg, #c8960c, #f5d020, #f6b900, #e8a800, #f5d020, #c8960c);
@@ -702,7 +717,11 @@ footer {
 <header>
   <div class="header-inner">
     <div class="logo">NSS<span>Finder</span></div>
-    <div class="header-badge">New Star Soccer · Datos v2025b</div>
+    <div class="header-badge"><span data-i18n="badge_data">New Star Soccer · Datos</span> v2025b</div>
+    <select class="lang-select" id="lang-select" onchange="setLang(this.value)" aria-label="Language / Idioma">
+      <option value="es">🌐 Español</option>
+      <option value="en">🌐 English</option>
+    </select>
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema" aria-label="Cambiar tema claro/oscuro"></button>
   </div>
 </header>
@@ -711,24 +730,24 @@ footer {
   <div class="hero-inner">
     <div>
       <h1>NSS <em>Finder</em></h1>
-      <p class="hero-desc">Estadísticas de New Star Soccer.<br>Los valores internos que el juego no te muestra. Compará equipos, ligas y selecciones.</p>
+      <p class="hero-desc" data-i18n-html="hero_desc">Estadísticas de New Star Soccer.<br>Los valores internos que el juego no te muestra. Compará equipos, ligas y selecciones.</p>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="num">3.766</div><div class="lbl">Clubes</div></div>
-      <div class="hero-stat"><div class="num">275</div><div class="lbl">Ligas</div></div>
-      <div class="hero-stat"><div class="num">116</div><div class="lbl">Países</div></div>
-      <div class="hero-stat"><div class="num">211</div><div class="lbl">Selecciones</div></div>
+      <div class="hero-stat"><div class="num">3.766</div><div class="lbl" data-i18n="stat_clubs">Clubes</div></div>
+      <div class="hero-stat"><div class="num">275</div><div class="lbl" data-i18n="stat_ligas">Ligas</div></div>
+      <div class="hero-stat"><div class="num">116</div><div class="lbl" data-i18n="stat_countries">Países</div></div>
+      <div class="hero-stat"><div class="num">211</div><div class="lbl" data-i18n="stat_sels">Selecciones</div></div>
     </div>
   </div>
 </div>
 
 <div class="tabs-bar">
   <div class="tabs" role="tablist">
-    <button class="tab-btn active" role="tab" aria-selected="true" onclick="showTab('clubs')">⚽ Clubes</button>
-    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('ligas')">🏆 Ligas</button>
-    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('sels')">🌍 Selecciones</button>
-    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('shuffle')">🎲 Shuffle</button>
-    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('info')">ℹ️ Info</button>
+    <button class="tab-btn active" role="tab" aria-selected="true" onclick="showTab('clubs')" data-i18n="tab_clubs">⚽ Clubes</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('ligas')" data-i18n="tab_ligas">🏆 Ligas</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('sels')" data-i18n="tab_sels">🌍 Selecciones</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('shuffle')" data-i18n="tab_shuffle">🎲 Shuffle</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('info')" data-i18n="tab_info">ℹ️ Info</button>
   </div>
 </div>
 
@@ -737,34 +756,34 @@ footer {
   <div class="filters">
     <div class="search-wrap">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="club-search" placeholder="Buscar club o sigla..." oninput="filterClubs()">
+      <input type="text" id="club-search" placeholder="Buscar club o sigla..." data-i18n-ph="ph_club_search" oninput="filterClubs()">
     </div>
-    <select id="club-country" onchange="filterClubs()"><option value="">Todos los países</option></select>
+    <select id="club-country" onchange="filterClubs()"><option value="" data-i18n="opt_all_countries">Todos los países</option></select>
     <select id="club-level" onchange="filterClubs()">
-      <option value="">Todos los niveles</option>
-      <option value="1ª división">1ª División</option>
-      <option value="2ª división">2ª División</option>
-      <option value="3ª división">3ª División</option>
-      <option value="4ª división">4ª División</option>
-      <option value="5ª división">5ª División</option>
-      <option value="6ª división">6ª División</option>
-      <option value="7ª división">7ª División</option>
-      <option value="No profesional / Amateur">Amateur</option>
+      <option value="" data-i18n="opt_all_levels">Todos los niveles</option>
+      <option value="1ª división" data-i18n="lvl_1">1ª División</option>
+      <option value="2ª división" data-i18n="lvl_2">2ª División</option>
+      <option value="3ª división" data-i18n="lvl_3">3ª División</option>
+      <option value="4ª división" data-i18n="lvl_4">4ª División</option>
+      <option value="5ª división" data-i18n="lvl_5">5ª División</option>
+      <option value="6ª división" data-i18n="lvl_6">6ª División</option>
+      <option value="7ª división" data-i18n="lvl_7">7ª División</option>
+      <option value="No profesional / Amateur" data-i18n="lvl_amateur">Amateur</option>
     </select>
     <div class="filter-count" id="club-count"></div>
   </div>
 
   <div class="style-switcher">
-    <span class="style-label">Vista:</span>
-    <button class="style-btn active" onclick="setStyle('b', this)">☰ Lista</button>
-    <button class="style-btn" onclick="setStyle('c', this)">⊞ Cartas</button>
+    <span class="style-label" data-i18n="label_view">Vista:</span>
+    <button class="style-btn active" onclick="setStyle('b', this)" data-i18n="view_list">☰ Lista</button>
+    <button class="style-btn" onclick="setStyle('c', this)" data-i18n="view_cards">⊞ Cartas</button>
     <span class="sw-sep"></span>
-    <span class="style-label">Fuerza:</span>
-    <button class="str-chip" aria-pressed="false" style="--c:#d4af37;--cbg:rgba(212,175,55,0.15)" onclick="toggleClubStr('elite',this)"><span class="str-chip-dot" style="background:#d4af37"></span>Elite mundial</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#2d9e52;--cbg:rgba(45,158,82,0.15)" onclick="toggleClubStr('muy',this)"><span class="str-chip-dot" style="background:#2d9e52"></span>Muy fuerte</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#c07a00;--cbg:rgba(192,122,0,0.15)" onclick="toggleClubStr('comp',this)"><span class="str-chip-dot" style="background:#c07a00"></span>Competitivo</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#b85c00;--cbg:rgba(184,92,0,0.15)" onclick="toggleClubStr('medio',this)"><span class="str-chip-dot" style="background:#b85c00"></span>Medio</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#c0392b;--cbg:rgba(192,57,43,0.15)" onclick="toggleClubStr('debil',this)"><span class="str-chip-dot" style="background:#c0392b"></span>Débil</button>
+    <span class="style-label" data-i18n="label_strength">Fuerza:</span>
+    <button class="str-chip" aria-pressed="false" style="--c:#d4af37;--cbg:rgba(212,175,55,0.15)" onclick="toggleClubStr('elite',this)"><span class="str-chip-dot" style="background:#d4af37"></span><span data-i18n="str_elite">Elite mundial</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#2d9e52;--cbg:rgba(45,158,82,0.15)" onclick="toggleClubStr('muy',this)"><span class="str-chip-dot" style="background:#2d9e52"></span><span data-i18n="str_muy">Muy fuerte</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c07a00;--cbg:rgba(192,122,0,0.15)" onclick="toggleClubStr('comp',this)"><span class="str-chip-dot" style="background:#c07a00"></span><span data-i18n="str_comp">Competitivo</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#b85c00;--cbg:rgba(184,92,0,0.15)" onclick="toggleClubStr('medio',this)"><span class="str-chip-dot" style="background:#b85c00"></span><span data-i18n="str_medio">Medio</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c0392b;--cbg:rgba(192,57,43,0.15)" onclick="toggleClubStr('debil',this)"><span class="str-chip-dot" style="background:#c0392b"></span><span data-i18n="str_debil">Débil</span></button>
   </div>
 
   <!-- TABLE B: Lista -->
@@ -772,12 +791,12 @@ footer {
     <table id="style-b">
       <thead><tr>
         <th onclick="sortClubs('rank')">#<span class="sa">↕</span></th>
-        <th onclick="sortClubs('abbr')">Sigla<span class="sa">↕</span></th>
-        <th onclick="sortClubs('name')">Nombre<span class="sa">↕</span></th>
-        <th onclick="sortClubs('country')">País<span class="sa">↕</span></th>
-        <th onclick="sortClubs('liga')">Liga<span class="sa">↕</span></th>
-        <th onclick="sortClubs('str')" class="sorted">Fuerza<span class="sa">↓</span></th>
-        <th class="hide-mob" onclick="sortClubs('natStr')">Selección<span class="sa">↕</span></th>
+        <th onclick="sortClubs('abbr')"><span data-i18n="th_abbr">Sigla</span><span class="sa">↕</span></th>
+        <th onclick="sortClubs('name')"><span data-i18n="th_name">Nombre</span><span class="sa">↕</span></th>
+        <th onclick="sortClubs('country')"><span data-i18n="th_country">País</span><span class="sa">↕</span></th>
+        <th onclick="sortClubs('liga')"><span data-i18n="th_liga">Liga</span><span class="sa">↕</span></th>
+        <th onclick="sortClubs('str')" class="sorted"><span data-i18n="th_str">Fuerza</span><span class="sa">↓</span></th>
+        <th class="hide-mob" onclick="sortClubs('natStr')"><span data-i18n="th_natstr">Selección</span><span class="sa">↕</span></th>
       </tr></thead>
       <tbody id="tbody-b"></tbody>
     </table>
@@ -794,26 +813,26 @@ footer {
   <div class="filters">
     <div class="search-wrap">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="liga-search" placeholder="Buscar liga o país..." oninput="filterLigas()">
+      <input type="text" id="liga-search" placeholder="Buscar liga o país..." data-i18n-ph="ph_liga_search" oninput="filterLigas()">
     </div>
     <select id="liga-level" onchange="filterLigas()">
-      <option value="">Todos los niveles</option>
-      <option value="1">1ª División</option>
-      <option value="2">2ª División</option>
-      <option value="3">3ª División</option>
-      <option value="4">4ª División o inferior</option>
+      <option value="" data-i18n="opt_all_levels">Todos los niveles</option>
+      <option value="1" data-i18n="lvl_1">1ª División</option>
+      <option value="2" data-i18n="lvl_2">2ª División</option>
+      <option value="3" data-i18n="lvl_3">3ª División</option>
+      <option value="4" data-i18n="liga_lvl_4">4ª División o inferior</option>
     </select>
     <div class="filter-count" id="liga-count"></div>
   </div>
   <div class="sort-bar">
-    <span class="sort-label">Ordenar:</span>
-    <button class="sort-chip active" onclick="sortLigas('rank',this)">Ranking</button>
-    <button class="sort-chip" onclick="sortLigas('avg_desc',this)">Mayor promedio</button>
-    <button class="sort-chip" onclick="sortLigas('avg_asc',this)">Menor promedio</button>
-    <button class="sort-chip" onclick="sortLigas('max_desc',this)">Mayor fuerza</button>
-    <button class="sort-chip" onclick="sortLigas('country',this)">País A→Z</button>
-    <button class="sort-chip" onclick="sortLigas('clubs',this)">Nº clubes</button>
-    <button class="sort-chip" onclick="sortLigas('shuffle',this)">🎲 Aleatorio</button>
+    <span class="sort-label" data-i18n="label_sort">Ordenar:</span>
+    <button class="sort-chip active" onclick="sortLigas('rank',this)" data-i18n="sort_ranking">Ranking</button>
+    <button class="sort-chip" onclick="sortLigas('avg_desc',this)" data-i18n="sort_avg_desc">Mayor promedio</button>
+    <button class="sort-chip" onclick="sortLigas('avg_asc',this)" data-i18n="sort_avg_asc">Menor promedio</button>
+    <button class="sort-chip" onclick="sortLigas('max_desc',this)" data-i18n="sort_max_desc">Mayor fuerza</button>
+    <button class="sort-chip" onclick="sortLigas('country',this)" data-i18n="sort_country">País A→Z</button>
+    <button class="sort-chip" onclick="sortLigas('clubs',this)" data-i18n="sort_nclubs">Nº clubes</button>
+    <button class="sort-chip" onclick="sortLigas('shuffle',this)" data-i18n="sort_random">🎲 Aleatorio</button>
   </div>
   <div class="liga-grid" id="ligas-grid"></div>
   <div class="pagination" id="ligas-pagination"></div>
@@ -824,32 +843,32 @@ footer {
   <div class="filters">
     <div class="search-wrap">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="sel-search" placeholder="Buscar país..." oninput="filterSels()">
+      <input type="text" id="sel-search" placeholder="Buscar país..." data-i18n-ph="ph_sel_search" oninput="filterSels()">
     </div>
     <select id="sel-continent" onchange="filterSels()">
-      <option value="">Todos los continentes</option>
-      <option value="Europe">Europa</option>
-      <option value="South America">Sudamérica</option>
-      <option value="North America">América del Norte</option>
-      <option value="Africa">África</option>
-      <option value="Asia">Asia</option>
-      <option value="Oceania">Oceanía</option>
+      <option value="" data-i18n="opt_all_continents">Todos los continentes</option>
+      <option value="Europe" data-i18n="cont_europe">Europa</option>
+      <option value="South America" data-i18n="cont_southamerica">Sudamérica</option>
+      <option value="North America" data-i18n="cont_northamerica">América del Norte</option>
+      <option value="Africa" data-i18n="cont_africa">África</option>
+      <option value="Asia" data-i18n="cont_asia">Asia</option>
+      <option value="Oceania" data-i18n="cont_oceania">Oceanía</option>
     </select>
     <div class="filter-count" id="sel-count"></div>
   </div>
   <div class="sort-bar">
-    <span class="sort-label">Ordenar:</span>
-    <button class="sel-sort-chip active" onclick="sortSels('str_desc',this)">Mayor fuerza ↓</button>
-    <button class="sel-sort-chip" onclick="sortSels('str_asc',this)">Menor fuerza ↑</button>
-    <button class="sel-sort-chip" onclick="sortSels('country',this)">País A→Z</button>
-    <button class="sel-sort-chip" onclick="sortSels('shuffle',this)">🎲 Aleatorio</button>
+    <span class="sort-label" data-i18n="label_sort">Ordenar:</span>
+    <button class="sel-sort-chip active" onclick="sortSels('str_desc',this)" data-i18n="sel_sort_str_desc">Mayor fuerza ↓</button>
+    <button class="sel-sort-chip" onclick="sortSels('str_asc',this)" data-i18n="sel_sort_str_asc">Menor fuerza ↑</button>
+    <button class="sel-sort-chip" onclick="sortSels('country',this)" data-i18n="sort_country">País A→Z</button>
+    <button class="sel-sort-chip" onclick="sortSels('shuffle',this)" data-i18n="sort_random">🎲 Aleatorio</button>
     <span class="sw-sep"></span>
-    <span class="sort-label">Fuerza:</span>
-    <button class="str-chip" aria-pressed="false" style="--c:#d4af37;--cbg:rgba(212,175,55,0.15)" onclick="toggleSelStr('elite',this)"><span class="str-chip-dot" style="background:#d4af37"></span>Elite mundial</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#2d9e52;--cbg:rgba(45,158,82,0.15)" onclick="toggleSelStr('muy',this)"><span class="str-chip-dot" style="background:#2d9e52"></span>Muy fuerte</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#c07a00;--cbg:rgba(192,122,0,0.15)" onclick="toggleSelStr('comp',this)"><span class="str-chip-dot" style="background:#c07a00"></span>Competitivo</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#b85c00;--cbg:rgba(184,92,0,0.15)" onclick="toggleSelStr('medio',this)"><span class="str-chip-dot" style="background:#b85c00"></span>Medio</button>
-    <button class="str-chip" aria-pressed="false" style="--c:#c0392b;--cbg:rgba(192,57,43,0.15)" onclick="toggleSelStr('debil',this)"><span class="str-chip-dot" style="background:#c0392b"></span>Débil</button>
+    <span class="sort-label" data-i18n="label_strength">Fuerza:</span>
+    <button class="str-chip" aria-pressed="false" style="--c:#d4af37;--cbg:rgba(212,175,55,0.15)" onclick="toggleSelStr('elite',this)"><span class="str-chip-dot" style="background:#d4af37"></span><span data-i18n="str_elite">Elite mundial</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#2d9e52;--cbg:rgba(45,158,82,0.15)" onclick="toggleSelStr('muy',this)"><span class="str-chip-dot" style="background:#2d9e52"></span><span data-i18n="str_muy">Muy fuerte</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c07a00;--cbg:rgba(192,122,0,0.15)" onclick="toggleSelStr('comp',this)"><span class="str-chip-dot" style="background:#c07a00"></span><span data-i18n="str_comp">Competitivo</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#b85c00;--cbg:rgba(184,92,0,0.15)" onclick="toggleSelStr('medio',this)"><span class="str-chip-dot" style="background:#b85c00"></span><span data-i18n="str_medio">Medio</span></button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c0392b;--cbg:rgba(192,57,43,0.15)" onclick="toggleSelStr('debil',this)"><span class="str-chip-dot" style="background:#c0392b"></span><span data-i18n="str_debil">Débil</span></button>
   </div>
   <div class="sel-grid" id="sels-grid"></div>
 </div>
@@ -859,22 +878,22 @@ footer {
   <div class="shuffle-wrap">
 
     <div class="shuffle-section">
-      <h2>⚽ Club Aleatorio</h2>
-      <p>Presioná el botón para recibir un club al azar de cualquier parte del mundo.</p>
-      <button class="shuffle-btn" onclick="doShuffleClub()">🎲 Dame un Club</button>
+      <h2 data-i18n="shuffle_club_h">⚽ Club Aleatorio</h2>
+      <p data-i18n="shuffle_club_p">Presioná el botón para recibir un club al azar de cualquier parte del mundo.</p>
+      <button class="shuffle-btn" onclick="doShuffleClub()" data-i18n="shuffle_club_btn">🎲 Dame un Club</button>
       <div class="shuffle-result" id="shuffle-club-result"></div>
     </div>
 
     <hr class="shuffle-divider">
 
     <div class="shuffle-section">
-      <h2>🌍 Selección Aleatoria</h2>
-      <p>Presioná el botón para recibir una selección nacional al azar.</p>
-      <button class="shuffle-btn" onclick="doShuffleSel()">🌍 Dame una Selección</button>
+      <h2 data-i18n="shuffle_sel_h">🌍 Selección Aleatoria</h2>
+      <p data-i18n="shuffle_sel_p">Presioná el botón para recibir una selección nacional al azar.</p>
+      <button class="shuffle-btn" onclick="doShuffleSel()" data-i18n="shuffle_sel_btn">🌍 Dame una Selección</button>
       <div class="shuffle-result" id="shuffle-sel-result"></div>
     </div>
 
-    <p class="shuffle-footer-text">Esta sección está diseñada para darte un club/selección aleatorio/a y que al crear una carrera o cambiar de club, dejes la decisión… al azar…</p>
+    <p class="shuffle-footer-text" data-i18n="shuffle_footer">Esta sección está diseñada para darte un club/selección aleatorio/a y que al crear una carrera o cambiar de club, dejes la decisión… al azar…</p>
 
   </div>
 </div>
@@ -883,87 +902,87 @@ footer {
 <div id="tab-info" class="content" style="display:none">
   <div class="info-content">
     <div class="info-section">
-      <h2><span class="ico">⚽</span> ¿Qué es NSS Finder?</h2>
-      <p>NSS Finder es una wiki no oficial creada por un fan argentino de New Star Soccer, para ayudar a otros jugadores a comparar equipos, ligas y selecciones usando los valores internos que el juego usa para simular los partidos, pero que nunca muestra directamente.</p>
-      <p>Lo que motivó este proyecto fue la falta de una fuente en internet que dé el dato objetivo: <em>"¿Qué club es más fuerte?"</em> — ahora podés saberlo.</p>
+      <h2><span class="ico">⚽</span> <span data-i18n="info_what_h">¿Qué es NSS Finder?</span></h2>
+      <p data-i18n-html="info_what_p1">NSS Finder es una wiki no oficial creada por un fan argentino de New Star Soccer, para ayudar a otros jugadores a comparar equipos, ligas y selecciones usando los valores internos que el juego usa para simular los partidos, pero que nunca muestra directamente.</p>
+      <p data-i18n-html="info_what_p2">Lo que motivó este proyecto fue la falta de una fuente en internet que dé el dato objetivo: <em>"¿Qué club es más fuerte?"</em> — ahora podés saberlo.</p>
     </div>
 
     <div class="info-section">
-      <h2><span class="ico">🗂️</span> Origen de los datos</h2>
-      <p>Los datos provienen de los archivos internos del juego (APK Android, versión 4.32, datos v2025b). El juego incluye estos archivos para generar los partidos:</p>
+      <h2><span class="ico">🗂️</span> <span data-i18n="info_data_h">Origen de los datos</span></h2>
+      <p data-i18n-html="info_data_p1">Los datos provienen de los archivos internos del juego (APK Android, versión 4.32, datos v2025b). El juego incluye estos archivos para generar los partidos:</p>
       <ul>
-        <li><strong>Clubs.txt</strong> — lista de todos los clubes con su valor de fuerza</li>
-        <li><strong>Nations.txt</strong> — selecciones nacionales con su fuerza</li>
-        <li><strong>Competitions.txt</strong> — estructura de ligas por país</li>
+        <li data-i18n-html="info_data_li1"><strong>Clubs.txt</strong> — lista de todos los clubes con su valor de fuerza</li>
+        <li data-i18n-html="info_data_li2"><strong>Nations.txt</strong> — selecciones nacionales con su fuerza</li>
+        <li data-i18n-html="info_data_li3"><strong>Competitions.txt</strong> — estructura de ligas por país</li>
       </ul>
-      <p style="margin-top:10px">Son los mismos valores que se pueden ver en el editor oculto de la versión PC (NSS5 en Steam, accesible con Ctrl+E).</p>
+      <p style="margin-top:10px" data-i18n-html="info_data_p2">Son los mismos valores que se pueden ver en el editor oculto de la versión PC (NSS5 en Steam, accesible con Ctrl+E).</p>
     </div>
 
     <div class="info-section">
-      <h2><span class="ico">💪</span> ¿Qué significa "Fuerza"?</h2>
-      <p>La <strong>Fuerza</strong> es el número interno (0–99) que el juego asigna a cada equipo para determinar su nivel en los partidos simulados: cuánto anota, qué tan difícil es ganarle, dónde termina en la tabla.</p>
+      <h2><span class="ico">💪</span> <span data-i18n="info_str_h">¿Qué significa "Fuerza"?</span></h2>
+      <p data-i18n-html="info_str_p">La <strong>Fuerza</strong> es el número interno (0–99) que el juego asigna a cada equipo para determinar su nivel en los partidos simulados: cuánto anota, qué tan difícil es ganarle, dónde termina en la tabla.</p>
       <div class="strength-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#d4af37"></div><div class="legend-text"><div class="range" style="color:#d4af37">95–99</div><div class="desc">Elite mundial</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2d9e52"></div><div class="legend-text"><div class="range" style="color:#2d9e52">80–94</div><div class="desc">Muy fuerte</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#c07a00"></div><div class="legend-text"><div class="range" style="color:#c07a00">70–79</div><div class="desc">Competitivo</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#b85c00"></div><div class="legend-text"><div class="range" style="color:#b85c00">55–69</div><div class="desc">Medio</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div><div class="legend-text"><div class="range" style="color:#c0392b">0–54</div><div class="desc">Débil</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#d4af37"></div><div class="legend-text"><div class="range" style="color:#d4af37">95–99</div><div class="desc" data-i18n="str_elite">Elite mundial</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2d9e52"></div><div class="legend-text"><div class="range" style="color:#2d9e52">80–94</div><div class="desc" data-i18n="str_muy">Muy fuerte</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c07a00"></div><div class="legend-text"><div class="range" style="color:#c07a00">70–79</div><div class="desc" data-i18n="str_comp">Competitivo</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#b85c00"></div><div class="legend-text"><div class="range" style="color:#b85c00">55–69</div><div class="desc" data-i18n="str_medio">Medio</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div><div class="legend-text"><div class="range" style="color:#c0392b">0–54</div><div class="desc" data-i18n="str_debil">Débil</div></div></div>
       </div>
     </div>
 
     <div class="info-section">
-      <h2><span class="ico">🌍</span> ¿Para qué sirve la columna "Selección"?</h2>
-      <p>Al inicio del juego elegís la nacionalidad de tu jugador. Esto importa porque, si tu desempeño lo justifica, podrás ser convocado y jugar mundiales con esa selección nacional — que en el juego funciona como un equipo más con su propia fuerza.</p>
-      <p>La columna "Selección" en la tabla de clubes muestra la fuerza de la selección del país de ese club. Es útil para entender el contexto: un club argentino tiene detrás una selección con 86 de fuerza, lo que dice bastante del nivel futbolístico del país.</p>
+      <h2><span class="ico">🌍</span> <span data-i18n="info_col_h">¿Para qué sirve la columna "Selección"?</span></h2>
+      <p data-i18n-html="info_col_p1">Al inicio del juego elegís la nacionalidad de tu jugador. Esto importa porque, si tu desempeño lo justifica, podrás ser convocado y jugar mundiales con esa selección nacional — que en el juego funciona como un equipo más con su propia fuerza.</p>
+      <p data-i18n-html="info_col_p2">La columna "Selección" en la tabla de clubes muestra la fuerza de la selección del país de ese club. Es útil para entender el contexto: un club argentino tiene detrás una selección con 86 de fuerza, lo que dice bastante del nivel futbolístico del país.</p>
     </div>
 
     <div class="info-section">
-      <h2><span class="ico">🔄</span> Ascensos y descensos</h2>
-      <p>Los clubes listados en cada liga corresponden al inicio de una nueva carrera. Al terminar la primera temporada, habrá ascensos y descensos.</p>
-      <div class="info-callout">
+      <h2><span class="ico">🔄</span> <span data-i18n="info_promo_h">Ascensos y descensos</span></h2>
+      <p data-i18n-html="info_promo_p">Los clubes listados en cada liga corresponden al inicio de una nueva carrera. Al terminar la primera temporada, habrá ascensos y descensos.</p>
+      <div class="info-callout" data-i18n-html="info_promo_callout">
         ⚠️ No se conoce con certeza el patrón exacto que sigue el juego para determinar los ascensos y descensos entre temporadas. Esta wiki refleja únicamente la configuración inicial.
       </div>
     </div>
 
     <div class="info-section">
-      <h2><span class="ico">📋</span> Tips de uso</h2>
+      <h2><span class="ico">📋</span> <span data-i18n="info_tips_h">Tips de uso</span></h2>
       <ul>
-        <li>La columna <strong>Sigla</strong> muestra el nombre abreviado exacto que aparece en el juego — ordená por sigla (A→Z) para encontrar equipos rápido mientras jugás</li>
-        <li>Hacé click en cualquier <strong>liga</strong> (en la tabla de clubes o en la pestaña Ligas) para ver todos sus equipos</li>
-        <li>Hacé click en una <strong>selección</strong> para ver sus ligas, y desde ahí en cada liga para ver sus clubes</li>
-        <li>En la pestaña de clubes podés elegir entre 2 vistas: Lista o Cartas</li>
-        <li>En Clubes y Selecciones podés filtrar por <strong>Fuerza</strong> (Elite mundial, Muy fuerte, etc.) — se pueden combinar varias categorías</li>
+        <li data-i18n-html="info_tip1">La columna <strong>Sigla</strong> muestra el nombre abreviado exacto que aparece en el juego — ordená por sigla (A→Z) para encontrar equipos rápido mientras jugás</li>
+        <li data-i18n-html="info_tip2">Hacé click en cualquier <strong>liga</strong> (en la tabla de clubes o en la pestaña Ligas) para ver todos sus equipos</li>
+        <li data-i18n-html="info_tip3">Hacé click en una <strong>selección</strong> para ver sus ligas, y desde ahí en cada liga para ver sus clubes</li>
+        <li data-i18n-html="info_tip4">En la pestaña de clubes podés elegir entre 2 vistas: Lista o Cartas</li>
+        <li data-i18n-html="info_tip5">En Clubes y Selecciones podés filtrar por <strong>Fuerza</strong> (Elite mundial, Muy fuerte, etc.) — se pueden combinar varias categorías</li>
       </ul>
     </div>
 
     <div class="info-section">
-      <h2><span class="ico">💬</span> Mensajes, ideas y recomendaciones</h2>
-      <p>¿Encontraste un error en los datos? ¿Tenés una idea para mejorar la wiki o algo que te gustaría ver? Dejame tu mensaje acá abajo. Toda sugerencia suma.</p>
+      <h2><span class="ico">💬</span> <span data-i18n="info_fb_h">Mensajes, ideas y recomendaciones</span></h2>
+      <p data-i18n="info_fb_p">¿Encontraste un error en los datos? ¿Tenés una idea para mejorar la wiki o algo que te gustaría ver? Dejame tu mensaje acá abajo. Toda sugerencia suma.</p>
       <form class="fb-form" id="fb-form" onsubmit="submitFeedback(event)">
         <div class="fb-row">
           <div>
-            <label for="fb-name">Nombre (opcional)</label>
-            <input type="text" id="fb-name" name="name" placeholder="Cómo te llamás">
+            <label for="fb-name" data-i18n="fb_name_label">Nombre (opcional)</label>
+            <input type="text" id="fb-name" name="name" placeholder="Cómo te llamás" data-i18n-ph="fb_name_ph">
           </div>
           <div>
-            <label for="fb-type">Tipo de mensaje</label>
+            <label for="fb-type" data-i18n="fb_type_label">Tipo de mensaje</label>
             <select id="fb-type" name="type">
-              <option value="Recomendación">Recomendación</option>
-              <option value="Idea para implementar">Idea para implementar</option>
-              <option value="Reporte de error en datos">Reporte de error en datos</option>
-              <option value="Mensaje general">Mensaje general</option>
+              <option value="Recomendación" data-i18n="fb_type_rec">Recomendación</option>
+              <option value="Idea para implementar" data-i18n="fb_type_idea">Idea para implementar</option>
+              <option value="Reporte de error en datos" data-i18n="fb_type_err">Reporte de error en datos</option>
+              <option value="Mensaje general" data-i18n="fb_type_gen">Mensaje general</option>
             </select>
           </div>
         </div>
         <div>
-          <label for="fb-email">Email (opcional, si querés respuesta)</label>
+          <label for="fb-email" data-i18n="fb_email_label">Email (opcional, si querés respuesta)</label>
           <input type="email" id="fb-email" name="email" placeholder="tu@email.com">
         </div>
         <div>
-          <label for="fb-msg">Tu mensaje</label>
-          <textarea id="fb-msg" name="message" placeholder="Escribí acá tu mensaje, idea o recomendación..." required></textarea>
+          <label for="fb-msg" data-i18n="fb_msg_label">Tu mensaje</label>
+          <textarea id="fb-msg" name="message" placeholder="Escribí acá tu mensaje, idea o recomendación..." data-i18n-ph="fb_msg_ph" required></textarea>
         </div>
-        <button type="submit" class="fb-submit" id="fb-submit">Enviar mensaje</button>
+        <button type="submit" class="fb-submit" id="fb-submit" data-i18n="fb_submit">Enviar mensaje</button>
         <div class="fb-status" id="fb-status"></div>
       </form>
     </div>
@@ -989,7 +1008,7 @@ footer {
   </div>
 </div>
 
-<footer>Creado por Lucio, un fan de NSS, con Claude Code 🇦🇷❤️</footer>
+<footer data-i18n="footer_text">Creado por Lucio, un fan de NSS, con Claude Code 🇦🇷❤️</footer>
 
 <script src="data.js"></script>
 <script>
@@ -997,6 +1016,143 @@ footer {
 // ── UTILS ──
 const FLAGS = {"Albania":"🇦🇱","Algeria":"🇩🇿","Andorra":"🇦🇩","Angola":"🇦🇴","Argentina":"🇦🇷","Armenia":"🇦🇲","Aruba":"🇦🇼","Australia":"🇦🇺","Austria":"🇦🇹","Azerbaijan":"🇦🇿","Bahrain":"🇧🇭","Belarus":"🇧🇾","Belgium":"🇧🇪","Belize":"🇧🇿","Bolivia":"🇧🇴","Bosnia":"🇧🇦","Botswana":"🇧🇼","Brazil":"🇧🇷","Bulgaria":"🇧🇬","Canada":"🇨🇦","Chile":"🇨🇱","China":"🇨🇳","Colombia":"🇨🇴","Costa Rica":"🇨🇷","Croatia":"🇭🇷","Cyprus":"🇨🇾","Czech Republic":"🇨🇿","Denmark":"🇩🇰","Dominican Republic":"🇩🇴","Ecuador":"🇪🇨","Egypt":"🇪🇬","El Salvador":"🇸🇻","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Estonia":"🇪🇪","Faroe Islands":"🇫🇴","Finland":"🇫🇮","France":"🇫🇷","Georgia":"🇬🇪","Germany":"🇩🇪","Ghana":"🇬🇭","Gibraltar":"🇬🇮","Greece":"🇬🇷","Guatemala":"🇬🇹","Haiti":"🇭🇹","Honduras":"🇭🇳","Hong Kong":"🇭🇰","Hungary":"🇭🇺","Iceland":"🇮🇸","India":"🇮🇳","Indonesia":"🇮🇩","Iran":"🇮🇷","Iraq":"🇮🇶","Ireland":"🇮🇪","Israel":"🇮🇱","Italy":"🇮🇹","Jamaica":"🇯🇲","Japan":"🇯🇵","Kazakhstan":"🇰🇿","Kenya":"🇰🇪","Kosovo":"🇽🇰","Latvia":"🇱🇻","Lithuania":"🇱🇹","Luxembourg":"🇱🇺","Malaysia":"🇲🇾","Mali":"🇲🇱","Malta":"🇲🇹","Mexico":"🇲🇽","Moldova":"🇲🇩","Montenegro":"🇲🇪","Morocco":"🇲🇦","N. Macedonia":"🇲🇰","Namibia":"🇳🇦","Netherlands":"🇳🇱","Nicaragua":"🇳🇮","Nigeria":"🇳🇬","Northern Ireland":"🇬🇧","Norway":"🇳🇴","Panama":"🇵🇦","Paraguay":"🇵🇾","Peru":"🇵🇪","Philippines":"🇵🇭","Poland":"🇵🇱","Portugal":"🇵🇹","Qatar":"🇶🇦","Romania":"🇷🇴","San Marino":"🇸🇲","Saudi Arabia":"🇸🇦","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Serbia":"🇷🇸","Seychelles":"🇸🇨","Singapore":"🇸🇬","Slovakia":"🇸🇰","Slovenia":"🇸🇮","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","St Kitts & Nevis":"🇰🇳","Sudan":"🇸🇩","Suriname":"🇸🇷","Sweden":"🇸🇪","Switzerland":"🇨🇭","Tanzania":"🇹🇿","Thailand":"🇹🇭","Trinidad & Tobago":"🇹🇹","Tunisia":"🇹🇳","Turkey":"🇹🇷","UAE":"🇦🇪","USA":"🇺🇸","Uganda":"🇺🇬","Ukraine":"🇺🇦","Uruguay":"🇺🇾","Uzbekistan":"🇺🇿","Venezuela":"🇻🇪","Vietnam":"🇻🇳","Wales":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","Zambia":"🇿🇲"};
 const fl = c => FLAGS[c] || "🏳️";
+
+// ── I18N ──
+let LANG = 'es';
+const I18N = {
+  es: {
+    badge_data: "New Star Soccer · Datos",
+    hero_desc: "Estadísticas de New Star Soccer.<br>Los valores internos que el juego no te muestra. Compará equipos, ligas y selecciones.",
+    stat_clubs: "Clubes", stat_ligas: "Ligas", stat_countries: "Países", stat_sels: "Selecciones",
+    tab_clubs: "⚽ Clubes", tab_ligas: "🏆 Ligas", tab_sels: "🌍 Selecciones", tab_shuffle: "🎲 Shuffle", tab_info: "ℹ️ Info",
+    ph_club_search: "Buscar club o sigla...", opt_all_countries: "Todos los países", opt_all_levels: "Todos los niveles",
+    lvl_1: "1ª División", lvl_2: "2ª División", lvl_3: "3ª División", lvl_4: "4ª División", lvl_5: "5ª División", lvl_6: "6ª División", lvl_7: "7ª División", lvl_amateur: "Amateur", liga_lvl_4: "4ª División o inferior",
+    label_view: "Vista:", view_list: "☰ Lista", view_cards: "⊞ Cartas", label_strength: "Fuerza:",
+    str_elite: "Elite mundial", str_muy: "Muy fuerte", str_comp: "Competitivo", str_medio: "Medio", str_debil: "Débil",
+    th_abbr: "Sigla", th_name: "Nombre", th_country: "País", th_liga: "Liga", th_str: "Fuerza", th_natstr: "Selección",
+    ph_liga_search: "Buscar liga o país...", label_sort: "Ordenar:",
+    sort_ranking: "Ranking", sort_avg_desc: "Mayor promedio", sort_avg_asc: "Menor promedio", sort_max_desc: "Mayor fuerza", sort_country: "País A→Z", sort_nclubs: "Nº clubes", sort_random: "🎲 Aleatorio",
+    ph_sel_search: "Buscar país...", opt_all_continents: "Todos los continentes",
+    cont_europe: "Europa", cont_southamerica: "Sudamérica", cont_northamerica: "América del Norte", cont_africa: "África", cont_asia: "Asia", cont_oceania: "Oceanía",
+    sel_sort_str_desc: "Mayor fuerza ↓", sel_sort_str_asc: "Menor fuerza ↑",
+    shuffle_club_h: "⚽ Club Aleatorio", shuffle_club_p: "Presioná el botón para recibir un club al azar de cualquier parte del mundo.", shuffle_club_btn: "🎲 Dame un Club",
+    shuffle_sel_h: "🌍 Selección Aleatoria", shuffle_sel_p: "Presioná el botón para recibir una selección nacional al azar.", shuffle_sel_btn: "🌍 Dame una Selección",
+    shuffle_footer: "Esta sección está diseñada para darte un club/selección aleatorio/a y que al crear una carrera o cambiar de club, dejes la decisión… al azar…",
+    info_what_h: "¿Qué es NSS Finder?",
+    info_what_p1: "NSS Finder es una wiki no oficial creada por un fan argentino de New Star Soccer, para ayudar a otros jugadores a comparar equipos, ligas y selecciones usando los valores internos que el juego usa para simular los partidos, pero que nunca muestra directamente.",
+    info_what_p2: "Lo que motivó este proyecto fue la falta de una fuente en internet que dé el dato objetivo: <em>\"¿Qué club es más fuerte?\"</em> — ahora podés saberlo.",
+    info_data_h: "Origen de los datos",
+    info_data_p1: "Los datos provienen de los archivos internos del juego (APK Android, versión 4.32, datos v2025b). El juego incluye estos archivos para generar los partidos:",
+    info_data_li1: "<strong>Clubs.txt</strong> — lista de todos los clubes con su valor de fuerza",
+    info_data_li2: "<strong>Nations.txt</strong> — selecciones nacionales con su fuerza",
+    info_data_li3: "<strong>Competitions.txt</strong> — estructura de ligas por país",
+    info_data_p2: "Son los mismos valores que se pueden ver en el editor oculto de la versión PC (NSS5 en Steam, accesible con Ctrl+E).",
+    info_str_h: "¿Qué significa \"Fuerza\"?",
+    info_str_p: "La <strong>Fuerza</strong> es el número interno (0–99) que el juego asigna a cada equipo para determinar su nivel en los partidos simulados: cuánto anota, qué tan difícil es ganarle, dónde termina en la tabla.",
+    info_col_h: "¿Para qué sirve la columna \"Selección\"?",
+    info_col_p1: "Al inicio del juego elegís la nacionalidad de tu jugador. Esto importa porque, si tu desempeño lo justifica, podrás ser convocado y jugar mundiales con esa selección nacional — que en el juego funciona como un equipo más con su propia fuerza.",
+    info_col_p2: "La columna \"Selección\" en la tabla de clubes muestra la fuerza de la selección del país de ese club. Es útil para entender el contexto: un club argentino tiene detrás una selección con 86 de fuerza, lo que dice bastante del nivel futbolístico del país.",
+    info_promo_h: "Ascensos y descensos",
+    info_promo_p: "Los clubes listados en cada liga corresponden al inicio de una nueva carrera. Al terminar la primera temporada, habrá ascensos y descensos.",
+    info_promo_callout: "⚠️ No se conoce con certeza el patrón exacto que sigue el juego para determinar los ascensos y descensos entre temporadas. Esta wiki refleja únicamente la configuración inicial.",
+    info_tips_h: "Tips de uso",
+    info_tip1: "La columna <strong>Sigla</strong> muestra el nombre abreviado exacto que aparece en el juego — ordená por sigla (A→Z) para encontrar equipos rápido mientras jugás",
+    info_tip2: "Hacé click en cualquier <strong>liga</strong> (en la tabla de clubes o en la pestaña Ligas) para ver todos sus equipos",
+    info_tip3: "Hacé click en una <strong>selección</strong> para ver sus ligas, y desde ahí en cada liga para ver sus clubes",
+    info_tip4: "En la pestaña de clubes podés elegir entre 2 vistas: Lista o Cartas",
+    info_tip5: "En Clubes y Selecciones podés filtrar por <strong>Fuerza</strong> (Elite mundial, Muy fuerte, etc.) — se pueden combinar varias categorías",
+    info_fb_h: "Mensajes, ideas y recomendaciones",
+    info_fb_p: "¿Encontraste un error en los datos? ¿Tenés una idea para mejorar la wiki o algo que te gustaría ver? Dejame tu mensaje acá abajo. Toda sugerencia suma.",
+    fb_name_label: "Nombre (opcional)", fb_name_ph: "Cómo te llamás", fb_type_label: "Tipo de mensaje",
+    fb_type_rec: "Recomendación", fb_type_idea: "Idea para implementar", fb_type_err: "Reporte de error en datos", fb_type_gen: "Mensaje general",
+    fb_email_label: "Email (opcional, si querés respuesta)", fb_msg_label: "Tu mensaje", fb_msg_ph: "Escribí acá tu mensaje, idea o recomendación...", fb_submit: "Enviar mensaje",
+    fb_need_msg: "Escribí un mensaje antes de enviar.", fb_mail_opened: "Se abrió tu app de correo para enviar el mensaje. ¡Gracias!", fb_sending: "Enviando...", fb_sent_ok: "¡Mensaje enviado! Muchas gracias por tu aporte. 🙌", fb_sent_err: "No se pudo enviar. Probá de nuevo en un rato.",
+    footer_text: "Creado por Lucio, un fan de NSS, con Claude Code 🇦🇷❤️",
+    u_clubs: "clubes", u_ligas: "ligas", u_sels: "selecciones", u_no_results: "Sin resultados",
+    d_str_max: "Fuerza máx.", d_str_min: "Fuerza mín.", d_avg: "Promedio", d_clubs: "Clubes",
+    th_d_club: "Club", d_sel_str: "Fuerza Selección", d_active_ligas: "Ligas activas", d_ranking: "Ranking",
+    d_nat_team: "Selección Nacional", d_no_ligas: "Sin ligas registradas",
+    th_d_level: "Nivel", th_d_league: "Liga", th_d_clubs: "Clubes", th_d_max: "Máx.", th_d_min: "Mín.", th_d_best: "Mejor club",
+    row_best: "Mejor:", row_avg: "Promedio:", mini_max: "Máx.", mini_min: "Mín.", sr_liga: "Liga:", sr_str: "Fuerza",
+    lvl_none: "Sin División"
+  },
+  en: {
+    badge_data: "New Star Soccer · Data",
+    hero_desc: "New Star Soccer stats.<br>The internal values the game never shows you. Compare clubs, leagues and national teams.",
+    stat_clubs: "Clubs", stat_ligas: "Leagues", stat_countries: "Countries", stat_sels: "Nat. Teams",
+    tab_clubs: "⚽ Clubs", tab_ligas: "🏆 Leagues", tab_sels: "🌍 National Teams", tab_shuffle: "🎲 Shuffle", tab_info: "ℹ️ Info",
+    ph_club_search: "Search club or abbr...", opt_all_countries: "All countries", opt_all_levels: "All levels",
+    lvl_1: "1st Division", lvl_2: "2nd Division", lvl_3: "3rd Division", lvl_4: "4th Division", lvl_5: "5th Division", lvl_6: "6th Division", lvl_7: "7th Division", lvl_amateur: "Amateur", liga_lvl_4: "4th Division or lower",
+    label_view: "View:", view_list: "☰ List", view_cards: "⊞ Cards", label_strength: "Strength:",
+    str_elite: "World elite", str_muy: "Very strong", str_comp: "Competitive", str_medio: "Average", str_debil: "Weak",
+    th_abbr: "Abbr", th_name: "Name", th_country: "Country", th_liga: "League", th_str: "Strength", th_natstr: "Nat. Team",
+    ph_liga_search: "Search league or country...", label_sort: "Sort:",
+    sort_ranking: "Ranking", sort_avg_desc: "Highest average", sort_avg_asc: "Lowest average", sort_max_desc: "Highest strength", sort_country: "Country A→Z", sort_nclubs: "# of clubs", sort_random: "🎲 Random",
+    ph_sel_search: "Search country...", opt_all_continents: "All continents",
+    cont_europe: "Europe", cont_southamerica: "South America", cont_northamerica: "North America", cont_africa: "Africa", cont_asia: "Asia", cont_oceania: "Oceania",
+    sel_sort_str_desc: "Highest strength ↓", sel_sort_str_asc: "Lowest strength ↑",
+    shuffle_club_h: "⚽ Random Club", shuffle_club_p: "Press the button to get a random club from anywhere in the world.", shuffle_club_btn: "🎲 Give me a Club",
+    shuffle_sel_h: "🌍 Random National Team", shuffle_sel_p: "Press the button to get a random national team.", shuffle_sel_btn: "🌍 Give me a National Team",
+    shuffle_footer: "This section is designed to give you a random club/national team, so when you start a career or change clubs, you can leave the decision… to chance…",
+    info_what_h: "What is NSS Finder?",
+    info_what_p1: "NSS Finder is an unofficial wiki created by an Argentine fan of New Star Soccer, to help other players compare clubs, leagues and national teams using the internal values the game uses to simulate matches but never shows directly.",
+    info_what_p2: "What motivated this project was the lack of a source online giving the objective answer: <em>\"Which club is stronger?\"</em> — now you can know.",
+    info_data_h: "Where the data comes from",
+    info_data_p1: "The data comes from the game's internal files (Android APK, version 4.32, v2025b data). The game includes these files to generate matches:",
+    info_data_li1: "<strong>Clubs.txt</strong> — list of all clubs with their strength value",
+    info_data_li2: "<strong>Nations.txt</strong> — national teams with their strength",
+    info_data_li3: "<strong>Competitions.txt</strong> — league structure by country",
+    info_data_p2: "These are the same values visible in the hidden editor of the PC version (NSS5 on Steam, accessible with Ctrl+E).",
+    info_str_h: "What does \"Strength\" mean?",
+    info_str_p: "<strong>Strength</strong> is the internal number (0–99) the game assigns to each team to determine its level in simulated matches: how much it scores, how hard it is to beat, where it finishes in the table.",
+    info_col_h: "What is the \"Nat. Team\" column for?",
+    info_col_p1: "At the start of the game you choose your player's nationality. This matters because, if your performance justifies it, you can be called up and play World Cups with that national team — which in the game works as just another team with its own strength.",
+    info_col_p2: "The \"Nat. Team\" column in the clubs table shows the strength of the national team of that club's country. It's useful for context: an Argentine club has a national team rated 86 behind it, which says a lot about the country's footballing level.",
+    info_promo_h: "Promotions and relegations",
+    info_promo_p: "The clubs listed in each league correspond to the start of a new career. After the first season ends, there will be promotions and relegations.",
+    info_promo_callout: "⚠️ The exact pattern the game follows to determine promotions and relegations between seasons is not known with certainty. This wiki only reflects the initial setup.",
+    info_tips_h: "Usage tips",
+    info_tip1: "The <strong>Abbr</strong> column shows the exact short name that appears in the game — sort by abbr (A→Z) to find teams quickly while you play",
+    info_tip2: "Click any <strong>league</strong> (in the clubs table or the Leagues tab) to see all its teams",
+    info_tip3: "Click a <strong>national team</strong> to see its leagues, and from there each league to see its clubs",
+    info_tip4: "In the clubs tab you can choose between 2 views: List or Cards",
+    info_tip5: "In Clubs and National Teams you can filter by <strong>Strength</strong> (World elite, Very strong, etc.) — multiple categories can be combined",
+    info_fb_h: "Messages, ideas and recommendations",
+    info_fb_p: "Found an error in the data? Got an idea to improve the wiki or something you'd like to see? Leave your message below. Every suggestion helps.",
+    fb_name_label: "Name (optional)", fb_name_ph: "Your name", fb_type_label: "Message type",
+    fb_type_rec: "Recommendation", fb_type_idea: "Feature idea", fb_type_err: "Data error report", fb_type_gen: "General message",
+    fb_email_label: "Email (optional, if you want a reply)", fb_msg_label: "Your message", fb_msg_ph: "Write your message, idea or recommendation here...", fb_submit: "Send message",
+    fb_need_msg: "Write a message before sending.", fb_mail_opened: "Your email app was opened to send the message. Thanks!", fb_sending: "Sending...", fb_sent_ok: "Message sent! Thanks a lot for your input. 🙌", fb_sent_err: "Couldn't send. Please try again later.",
+    footer_text: "Created by Lucio, an NSS fan, with Claude Code 🇦🇷❤️",
+    u_clubs: "clubs", u_ligas: "leagues", u_sels: "national teams", u_no_results: "No results",
+    d_str_max: "Max strength", d_str_min: "Min strength", d_avg: "Average", d_clubs: "Clubs",
+    th_d_club: "Club", d_sel_str: "Team strength", d_active_ligas: "Active leagues", d_ranking: "Ranking",
+    d_nat_team: "National Team", d_no_ligas: "No leagues registered",
+    th_d_level: "Level", th_d_league: "League", th_d_clubs: "Clubs", th_d_max: "Max", th_d_min: "Min", th_d_best: "Best club",
+    row_best: "Best:", row_avg: "Average:", mini_max: "Max", mini_min: "Min", sr_liga: "League:", sr_str: "Strength",
+    lvl_none: "No Division"
+  }
+};
+function t(key) { return (I18N[LANG] && I18N[LANG][key]) || (I18N.es[key]) || key; }
+const CONTINENTS_EN = {"Europe":"Europe","South America":"South America","North America":"North America","Africa":"Africa","Asia":"Asia","Oceania":"Oceania"};
+function contName(c) { return LANG==='en' ? (CONTINENTS_EN[c]||c) : (CONTINENTS_ES[c]||c); }
+
+function applyStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+}
+function setLang(lang) {
+  LANG = (lang==='en') ? 'en' : 'es';
+  localStorage.setItem('nss-lang', LANG);
+  document.documentElement.setAttribute('lang', LANG);
+  const sel = document.getElementById('lang-select'); if(sel) sel.value = LANG;
+  applyStaticI18n();
+  // re-render dynamic content
+  if(typeof renderClubs==='function') renderClubs();
+  if(typeof renderLigas==='function') renderLigas();
+  if(typeof renderSels==='function') renderSels();
+}
 function sc(v) {
   if(v>=95) return "#d4af37";
   if(v>=80) return "#2d9e52";
@@ -1011,15 +1167,18 @@ function nb(v) {
   return "rgba(136,136,128,0.1)";
 }
 function levelName(l) {
-  if(l===99||l==='99'||String(l).startsWith('99')) return 'Sin División';
-  const m = {"1ª división":"Primera División","2ª división":"Segunda División","3ª división":"Tercera División","4ª división":"Cuarta División","5ª división":"Quinta División","6ª división":"Sexta División","7ª división":"Séptima División","No profesional / Amateur":"División Amateur"};
-  return m[l] || l;
+  if(l===99||l==='99'||String(l).startsWith('99')) return t('lvl_none');
+  const es = {"1ª división":"Primera División","2ª división":"Segunda División","3ª división":"Tercera División","4ª división":"Cuarta División","5ª división":"Quinta División","6ª división":"Sexta División","7ª división":"Séptima División","No profesional / Amateur":"División Amateur"};
+  const en = {"1ª división":"1st Division","2ª división":"2nd Division","3ª división":"3rd Division","4ª división":"4th Division","5ª división":"5th Division","6ª división":"6th Division","7ª división":"7th Division","No profesional / Amateur":"Amateur Division"};
+  return (LANG==='en'?en:es)[l] || l;
 }
 function levelBadge(numLevel) {
-  return numLevel===99 ? 'Sin Div' : `${numLevel}ª Div`;
+  if(numLevel===99) return LANG==='en' ? 'No Div' : 'Sin Div';
+  return LANG==='en' ? `Div ${numLevel}` : `${numLevel}ª Div`;
 }
 function levelFull(numLevel) {
-  return numLevel===99 ? 'Sin División' : `${numLevel}ª División`;
+  if(numLevel===99) return t('lvl_none');
+  return LANG==='en' ? `Division ${numLevel}` : `${numLevel}ª División`;
 }
 function strClass(v) { return v>=95 ? 'str-elite' : ''; }
 function esc(s) { return String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
@@ -1130,8 +1289,8 @@ function renderClubs() {
   const total = cFilt.length;
   const start = (cPage-1)*CPP;
   const page = cFilt.slice(start, start+CPP);
-  document.getElementById('club-count').innerHTML = `<b>${total.toLocaleString()}</b> clubes`;
-  const empty = '<div class="empty">Sin resultados</div>';
+  document.getElementById('club-count').innerHTML = `<b>${total.toLocaleString()}</b> ${t('u_clubs')}`;
+  const empty = `<div class="empty">${t('u_no_results')}</div>`;
   if(cStyle==='b') {
     document.getElementById('tbody-b').innerHTML = total===0 ? `<tr><td colspan="7">${empty}</td></tr>` : page.map(c=>rowHTML(c)).join('');
   } else {
@@ -1176,20 +1335,20 @@ function renderLigas() {
   const total = lFilt.length;
   const start = (lPage-1)*LPP;
   const page = lFilt.slice(start, start+LPP);
-  document.getElementById('liga-count').innerHTML = `<b>${total}</b> ligas`;
+  document.getElementById('liga-count').innerHTML = `<b>${total}</b> ${t('u_ligas')}`;
   const grid = document.getElementById('ligas-grid');
-  if(total===0) { grid.innerHTML='<div class="empty">Sin resultados</div>'; renderPag('ligas',0,LPP,lPage,p=>{lPage=p;renderLigas();}); return; }
+  if(total===0) { grid.innerHTML=`<div class="empty">${t('u_no_results')}</div>`; renderPag('ligas',0,LPP,lPage,p=>{lPage=p;renderLigas();}); return; }
   grid.innerHTML = page.map(l => {
     const lc = l.level===1?"#1a7a3c":l.level===2?"#2d9e52":l.level===3?"#c07a00":"#888880";
     const lb = l.level===1?"rgba(26,122,60,0.1)":l.level===2?"rgba(45,158,82,0.1)":l.level===3?"rgba(192,122,0,0.1)":"rgba(136,136,128,0.1)";
     return `<div class="liga-row" onclick="openLigaDetail('${l.liga.replace(/'/g,"\\'")}','${l.country.replace(/'/g,"\\'")}')">
       <div class="liga-rank ${l.rank<=10?'top':''}">${l.rank}</div>
       <div class="liga-info">
-        <div class="name">${fl(l.country)} ${l.country} <span class="liga-badge" style="color:${lc};background:${lb}">${levelBadge(l.level)}</span></div>
-        <div class="sub">${l.liga} · ${l.clubs} clubes · Mejor: <b>${l.best}</b> · Promedio: ${l.avg}</div>
+        <div class="name">${fl(l.country)} ${esc(l.country)} <span class="liga-badge" style="color:${lc};background:${lb}">${levelBadge(l.level)}</span></div>
+        <div class="sub">${esc(l.liga)} · ${l.clubs} ${t('u_clubs')} · ${t('row_best')} <b>${esc(l.best)}</b> · ${t('row_avg')} ${l.avg}</div>
       </div>
-      <div class="stat-mini"><div class="v" style="color:${sc(l.max)}">${l.max}</div><div class="l">Máx.</div></div>
-      <div class="stat-mini"><div class="v" style="color:${sc(l.min)}">${l.min}</div><div class="l">Mín.</div></div>
+      <div class="stat-mini"><div class="v" style="color:${sc(l.max)}">${l.max}</div><div class="l">${t('mini_max')}</div></div>
+      <div class="stat-mini"><div class="v" style="color:${sc(l.min)}">${l.min}</div><div class="l">${t('mini_min')}</div></div>
     </div>`;
   }).join('');
   renderPag('ligas', total, LPP, lPage, p=>{lPage=p;renderLigas();});
@@ -1229,19 +1388,19 @@ async function submitFeedback(e) {
   const type = document.getElementById('fb-type').value;
   const msg = document.getElementById('fb-msg').value.trim();
   status.className = 'fb-status';
-  if(!msg) { status.textContent = 'Escribí un mensaje antes de enviar.'; status.classList.add('err'); return; }
+  if(!msg) { status.textContent = t('fb_need_msg'); status.classList.add('err'); return; }
 
   // Sin access key configurada → respaldo por mail
   if(!WEB3FORMS_KEY) {
     const subject = encodeURIComponent(`[NSS Finder] ${type}` + (name ? ` — ${name}` : ''));
     const body = encodeURIComponent(`${msg}\n\n---\nTipo: ${type}\nNombre: ${name || '-'}\nEmail: ${email || '-'}`);
     window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
-    status.textContent = 'Se abrió tu app de correo para enviar el mensaje. ¡Gracias!';
+    status.textContent = t('fb_mail_opened');
     status.classList.add('ok');
     return;
   }
 
-  btn.disabled = true; status.textContent = 'Enviando...';
+  btn.disabled = true; status.textContent = t('fb_sending');
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
@@ -1258,14 +1417,14 @@ async function submitFeedback(e) {
     });
     const data = await res.json();
     if(data.success) {
-      status.textContent = '¡Mensaje enviado! Muchas gracias por tu aporte. 🙌';
+      status.textContent = t('fb_sent_ok');
       status.classList.add('ok');
       document.getElementById('fb-form').reset();
     } else {
       throw new Error(data.message || 'Error');
     }
   } catch(err) {
-    status.textContent = 'No se pudo enviar. Probá de nuevo en un rato.';
+    status.textContent = t('fb_sent_err');
     status.classList.add('err');
   } finally {
     btn.disabled = false;
@@ -1287,13 +1446,13 @@ function applySSS() {
 }
 function renderSels() {
   const total = sFilt.length;
-  document.getElementById('sel-count').innerHTML = `<b>${total}</b> selecciones`;
+  document.getElementById('sel-count').innerHTML = `<b>${total}</b> ${t('u_sels')}`;
   document.getElementById('sels-grid').innerHTML = total===0
-    ? '<div class="empty" style="grid-column:1/-1">Sin resultados</div>'
+    ? `<div class="empty" style="grid-column:1/-1">${t('u_no_results')}</div>`
     : sFilt.map((s,i) => `<div class="sel-card" onclick="openSelDetail('${s.country.replace(/'/g,"\\'")}')">
         <div class="sel-rank">${i+1}</div>
         <div class="sel-flag">${fl(s.country)}</div>
-        <div class="sel-info"><div class="country">${esc(s.country)}</div><div class="continent">${esc(s.continent)}</div></div>
+        <div class="sel-info"><div class="country">${esc(s.country)}</div><div class="continent">${esc(contName(s.continent))}</div></div>
         <div class="sel-str-val" style="color:${sc(s.str)}">${s.str}</div>
       </div>`).join('');
 }
@@ -1304,13 +1463,13 @@ function openLigaDetail(ligaId, country) {
   const liga = DATA.ligas.find(l=>l.liga===ligaId&&l.country===country);
   const avg = liga ? liga.avg : (clubs.reduce((s,c)=>s+c.str,0)/clubs.length).toFixed(1);
   document.getElementById('detail-title').innerHTML = `${fl(country)} ${esc(ligaId)}`;
-  document.getElementById('detail-sub').textContent = country + (liga ? ` · ${levelFull(liga.level)} · ${liga.clubs} clubes` : '');
+  document.getElementById('detail-sub').textContent = country + (liga ? ` · ${levelFull(liga.level)} · ${liga.clubs} ${t('u_clubs')}` : '');
   document.getElementById('detail-stats').innerHTML = `
-    <div class="detail-stat"><div class="val" style="color:${sc(clubs[0]?.str||0)}">${clubs[0]?.str||'-'}</div><div class="lbl">Fuerza máx.</div></div>
-    <div class="detail-stat"><div class="val" style="color:${sc(clubs[clubs.length-1]?.str||0)}">${clubs[clubs.length-1]?.str||'-'}</div><div class="lbl">Fuerza mín.</div></div>
-    <div class="detail-stat"><div class="val" style="color:${sc(avg)}">${avg}</div><div class="lbl">Promedio</div></div>
-    <div class="detail-stat"><div class="val" style="color:#1a7a3c">${clubs.length}</div><div class="lbl">Clubes</div></div>`;
-  document.getElementById('detail-thead').innerHTML = '<th>#</th><th>Sigla</th><th>Club</th><th>Fuerza</th>';
+    <div class="detail-stat"><div class="val" style="color:${sc(clubs[0]?.str||0)}">${clubs[0]?.str||'-'}</div><div class="lbl">${t('d_str_max')}</div></div>
+    <div class="detail-stat"><div class="val" style="color:${sc(clubs[clubs.length-1]?.str||0)}">${clubs[clubs.length-1]?.str||'-'}</div><div class="lbl">${t('d_str_min')}</div></div>
+    <div class="detail-stat"><div class="val" style="color:${sc(avg)}">${avg}</div><div class="lbl">${t('d_avg')}</div></div>
+    <div class="detail-stat"><div class="val" style="color:#1a7a3c">${clubs.length}</div><div class="lbl">${t('d_clubs')}</div></div>`;
+  document.getElementById('detail-thead').innerHTML = `<th>#</th><th>${t('th_abbr')}</th><th>${t('th_d_club')}</th><th>${t('th_str')}</th>`;
   document.getElementById('detail-tbody').innerHTML = clubs.map((c,i)=>`
     <tr><td class="rank-num">${i+1}</td>
     <td><span class="club-abbr-cell">${esc(c.abbr)}</span></td>
@@ -1325,14 +1484,14 @@ function openSelDetail(country) {
   const sel = DATA.selecciones.find(s=>s.country===country);
   const ligas = DATA.ligas.filter(l=>l.country===country).sort((a,b)=>a.level-b.level);
   document.getElementById('detail-title').innerHTML = `${fl(country)} ${esc(country)}`;
-  document.getElementById('detail-sub').textContent = sel ? `Selección Nacional · ${sel.continent}` : country;
+  document.getElementById('detail-sub').textContent = sel ? `${t('d_nat_team')} · ${contName(sel.continent)}` : country;
   document.getElementById('detail-stats').innerHTML = `
-    <div class="detail-stat"><div class="val" style="color:${sc(sel?.str||0)}">${sel?.str||'-'}</div><div class="lbl">Fuerza Selección</div></div>
-    <div class="detail-stat"><div class="val" style="color:#1a7a3c">${ligas.length}</div><div class="lbl">Ligas activas</div></div>
-    <div class="detail-stat"><div class="val" style="color:${sc(sel?.str||0)}">#${sel?.rank||'-'}</div><div class="lbl">Ranking</div></div>`;
-  document.getElementById('detail-thead').innerHTML = '<th>Nivel</th><th>Liga</th><th>Clubes</th><th>Máx.</th><th>Mín.</th><th>Mejor club</th>';
+    <div class="detail-stat"><div class="val" style="color:${sc(sel?.str||0)}">${sel?.str||'-'}</div><div class="lbl">${t('d_sel_str')}</div></div>
+    <div class="detail-stat"><div class="val" style="color:#1a7a3c">${ligas.length}</div><div class="lbl">${t('d_active_ligas')}</div></div>
+    <div class="detail-stat"><div class="val" style="color:${sc(sel?.str||0)}">#${sel?.rank||'-'}</div><div class="lbl">${t('d_ranking')}</div></div>`;
+  document.getElementById('detail-thead').innerHTML = `<th>${t('th_d_level')}</th><th>${t('th_d_league')}</th><th>${t('th_d_clubs')}</th><th>${t('th_d_max')}</th><th>${t('th_d_min')}</th><th>${t('th_d_best')}</th>`;
   document.getElementById('detail-tbody').innerHTML = ligas.length===0
-    ? '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Sin ligas registradas</td></tr>'
+    ? `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">${t('d_no_ligas')}</td></tr>`
     : ligas.map(l=>`<tr style="cursor:pointer" onclick="closeDetailBtn();setTimeout(()=>openLigaDetail('${l.liga.replace(/'/g,"\\'")}','${l.country.replace(/'/g,"\\'")}'),60)">
         <td><span class="nat-badge" style="background:rgba(26,122,60,0.1);color:#1a7a3c">${l.level===99?'SD':`${l.level}ª`}</span></td>
         <td class="liga-link">${esc(l.liga)}</td>
@@ -1380,10 +1539,10 @@ function doShuffleClub() {
     <div class="sr-meta">
       <strong>${esc(c.name)}</strong><br>
       ${fl(c.country)} ${esc(c.country)} · ${levelName(c.level)}<br>
-      Liga: <strong>${esc(c.liga)}</strong>
+      ${t('sr_liga')} <strong>${esc(c.liga)}</strong>
     </div>
     <div class="sr-str ${sc_}" ${ss_}>${c.str}</div>
-    <div class="sr-str-lbl">Fuerza</div>`;
+    <div class="sr-str-lbl">${t('sr_str')}</div>`;
   void el.offsetHeight;
   el.classList.add('visible');
 }
@@ -1396,10 +1555,10 @@ function doShuffleSel() {
   el.innerHTML = `
     <div class="sr-name">${fl(s.country)} ${esc(s.country)}</div>
     <div class="sr-meta">
-      <strong>${esc(CONTINENTS_ES[s.continent]||s.continent)}</strong>
+      <strong>${esc(contName(s.continent))}</strong>
     </div>
     <div class="sr-str ${sc_}" ${ss_}>${s.str}</div>
-    <div class="sr-str-lbl">Fuerza</div>`;
+    <div class="sr-str-lbl">${t('sr_str')}</div>`;
   void el.offsetHeight;
   el.classList.add('visible');
 }
@@ -1419,6 +1578,10 @@ function setTheme(theme) {
 }
 
 // ── INIT ──
+// Idioma: preferencia guardada → idioma del navegador/sistema → español por defecto
+const _navLang = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+const _savedLang = localStorage.getItem('nss-lang') || (_navLang.startsWith('es') ? 'es' : 'en');
+setLang(_savedLang);
 filterClubs(); filterLigas(); filterSels();
 const _savedTheme = localStorage.getItem('nss-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 setTheme(_savedTheme);
