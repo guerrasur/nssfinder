@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ NSS Wiki - Fuerza de Clubes v2 | New Star Soccer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #0a5c2e 0%, #0d7a3d 50%, #0a5c2e 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #fff;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Patrón de cancha */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      repeating-linear-gradient(90deg, 
+        transparent 0, transparent 48px, 
+        rgba(255,255,255,0.03) 48px, rgba(255,255,255,0.03) 50px),
+      repeating-linear-gradient(0deg, 
+        rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 80px, 
+        rgba(0,0,0,0) 80px, rgba(0,0,0,0) 160px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .pitch-circle {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px; height: 400px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .pitch-line {
+    position: fixed;
+    top: 0; left: 50%;
+    width: 3px; height: 100%;
+    background: rgba(255,255,255,0.08);
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* ============ BARRA DE BÚSQUEDA GLOBAL ============ */
+  .global-search {
+    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(13,71,37,0.7));
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #ffd700;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+  }
+  
+  .global-search-inner {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .global-search input {
+    flex: 1;
+    min-width: 250px;
+    padding: 15px 20px;
+    border-radius: 50px;
+    border: 2px solid #ffd700;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: bold;
+    outline: none;
+    transition: all 0.3s;
+  }
+  
+  .global-search input:focus {
+    box-shadow: 0 0 20px rgba(255,215,0,0.5);
+    transform: scale(1.02);
+  }
+  
+  .global-search input::placeholder { color: rgba(255,255,255,0.6); }
+  
+  .global-search-results {
+    background: rgba(0,0,0,0.8);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    border: 1px solid #ffd700;
+  }
+  
+  .global-search-results.active { display: block; }
+  
+  .global-result-item {
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .global-result-item:hover { background: rgba(255,215,0,0.2); }
+  
+  .global-result-item:last-child { border-bottom: none; }
+  
+  .result-strength {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+    font-size: 0.9em;
+  }
+  
+  header {
+    text-align: center;
+    padding: 30px 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+  }
+  
+  header h1 {
+    font-size: 2.5em;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #fff, #ffd700, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+  }
+  
+  .stats-bar {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .stat-item {
+    background: rgba(255,255,255,0.1);
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.9em;
+  }
+  
+  .stat-item strong { color: #ffd700; }
+  
+  .tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: #fff;
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  
+  .tab-btn:hover {
+    background: rgba(255,215,0,0.2);
+    transform: translateY(-2px);
+  }
+  
+  .tab-btn.active {
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    color: #0a3c1e;
+    border-color: #ffd700;
+  }
+  
+  .panel {
+    display: none;
+    background: rgba(0,0,0,0.5);
+    border-radius: 0 10px 15px 15px;
+    padding: 20px;
+    border: 2px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+  }
+  
+  .panel.active { display: block; }
+  
+  .search-box {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  
+  .search-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  @media (max-width: 900px) {
+    .search-row { grid-template-columns: 1fr 1fr; }
+  }
+  
+  .search-row input, .search-row select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    font-size: 0.95em;
+  }
+  
+  .search-row input::placeholder { color: rgba(255,255,255,0.5); }
+  .search-row select option { background: #0a3c1e; }
+  
+  .btn-reset {
+    padding: 10px 20px;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-reset:hover { background: #c82333; }
+  
+  .results-info {
+    background: rgba(255,215,0,0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid #ffd700;
+    font-size: 0.95em;
+  }
+  
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.3);
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+    font-size: 0.9em;
+  }
+  
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(135deg, #0a3c1e, #0d4a25);
+  }
+  
+  th {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 2px solid #ffd700;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  
+  th:hover { background: rgba(255,215,0,0.2); }
+  th.sorted-asc::after { content: ' ▲'; color: #ffd700; }
+  th.sorted-desc::after { content: ' ▼'; color: #ffd700; }
+  
+  td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  tbody tr { transition: background 0.2s; }
+  tbody tr:hover { background: rgba(255,215,0,0.15); }
+  tbody tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+  tbody tr:nth-child(even):hover { background: rgba(255,215,0,0.15); }
+  
+  .rank-cell { font-weight: bold; color: #ffd700; text-align: center; }
+  .rank-1 { color: #ffd700; font-size: 1.2em; }
+  .rank-2 { color: #c0c0c0; }
+  .rank-3 { color: #cd7f32; }
+  
+  /* ============ NUEVA PALETA DE COLORES ============ */
+  .strength-bar {
+    display: inline-block;
+    min-width: 40px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.9em;
+    transition: all 0.3s;
+  }
+  
+  /* ÉLITE: Dorado con brillo */
+  .strength-elite {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+    color: #000 !important;
+    box-shadow: 0 0 15px rgba(255,215,0,0.8), 
+                inset 0 0 10px rgba(255,255,255,0.5);
+    animation: shine 2s ease-in-out infinite;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+    border: 1px solid #fff;
+  }
+  
+  @keyframes shine {
+    0%, 100% { box-shadow: 0 0 15px rgba(255,215,0,0.8), inset 0 0 10px rgba(255,255,255,0.3); }
+    50% { box-shadow: 0 0 25px rgba(255,215,0,1), inset 0 0 15px rgba(255,255,255,0.7); }
+  }
+  
+  /* MUY FUERTE: Verde oscuro */
+  .strength-verystrong {
+    background: linear-gradient(135deg, #0d5c2e, #148542);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  
+  /* FUERTE: Verde claro */
+  .strength-strong {
+    background: linear-gradient(135deg, #2ecc71, #58d68d);
+    color: #000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* MEDIO: Amarillo/Naranja */
+  .strength-medium {
+    background: linear-gradient(135deg, #f39c12, #ffa502);
+    color: #000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* BAJO: Rojo */
+  .strength-low {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  
+  /* DÉBIL: Gris */
+  .strength-weak {
+    background: linear-gradient(135deg, #5d6d7e, #808b96);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  .strength-veryweak {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #bbb;
+  }
+  
+  .country-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    font-size: 0.9em;
+  }
+  
+  .country-flag {
+    font-size: 1.2em;
+    line-height: 1;
+  }
+  
+  .league-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: rgba(13, 71, 37, 0.7);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 15px;
+    font-size: 0.85em;
+  }
+  
+  .info-box {
+    background: rgba(13, 71, 37, 0.6);
+    border-left: 4px solid #ffd700;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .info-box h3 { color: #ffd700; margin-bottom: 8px; }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .pagination button {
+    padding: 8px 15px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .pagination button:hover:not(:disabled) {
+    background: #ffd700;
+    color: #000;
+  }
+  
+  .pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .pagination span { padding: 8px 15px; background: rgba(255,215,0,0.2); border-radius: 5px; }
+  
+  footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    opacity: 0.7;
+    font-size: 0.9em;
+  }
+  
+  .highlight { background: #ffd700; color: #000; padding: 0 2px; border-radius: 2px; }
+  .no-results { text-align: center; padding: 40px; font-size: 1.2em; opacity: 0.7; }
+  
+  /* Scrollbar personalizada */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+  ::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #ffa500; }
+</style>
+</head>
+<body>
+<div class="pitch-circle"></div>
+<div class="pitch-line"></div>
+
+<div class="container">
+  <!-- ============ BÚSQUEDA GLOBAL ============ -->
+  <div class="global-search">
+    <div class="global-search-inner">
+      <span style="font-size: 1.5em;">🔍</span>
+      <input type="text" id="global-search" placeholder="Buscar cualquier club, liga o selección... (ej: 'Boca', 'Argentina', 'Premier')">
+    </div>
+    <div class="global-search-results" id="global-results"></div>
+  </div>
+
+  <header>
+    <h1>⚽ NSS Wiki - Fuerza de Clubes v2</h1>
+    <p>Guía completa de New Star Soccer | Datos v2025b con Argentina agregada</p>
+    <div class="stats-bar">
+      <div class="stat-item"><strong id="stat-clubs">0</strong> Clubes</div>
+      <div class="stat-item"><strong id="stat-arg">0</strong> Argentinos</div>
+      <div class="stat-item"><strong id="stat-leagues">0</strong> Ligas</div>
+      <div class="stat-item"><strong id="stat-nations">0</strong> Selecciones</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('clubs')">🏆 Ranking de Clubes</button>
+    <button class="tab-btn" onclick="showTab('leagues')">📊 Resumen por Liga</button>
+    <button class="tab-btn" onclick="showTab('nations')">🌍 Selecciones</button>
+    <button class="tab-btn" onclick="showTab('noligue')">📋 Sin Liga</button>
+    <button class="tab-btn" onclick="showTab('info')">ℹ️ Info</button>
+  </div>
+
+  <!-- PANEL CLUBES -->
+  <div id="panel-clubs" class="panel active">
+    <div class="search-box">
+      <div class="search-row">
+        <input type="text" id="search-club" placeholder="🔍 Buscar club...">
+        <select id="filter-country"><option value="">🌎 Todos los países</option></select>
+        <select id="filter-league"><option value="">⚽ Todas las ligas</option></select>
+        <select id="filter-level"><option value="">📊 Todos los niveles</option></select>
+        <select id="filter-strength">
+          <option value="">💪 Cualquier fuerza</option>
+          <option value="90-99">🥇 Élite (90+)</option>
+          <option value="80-89">🟢 Muy fuerte (80-89)</option>
+          <option value="70-79">🟢 Fuerte (70-79)</option>
+          <option value="60-69">🟡 Medio (60-69)</option>
+          <option value="50-59">🔴 Bajo (50-59)</option>
+          <option value="0-49">⚫ Débil (&lt;50)</option>
+        </select>
+        <button class="btn-reset" onclick="resetFilters('clubs')">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="results-info" id="clubs-info">Mostrando todos los clubes</div>
+    <div class="table-wrap">
+      <table id="table-clubs">
+        <thead>
+          <tr>
+            <th onclick="sortTable('clubs',0,'num')">#</th>
+            <th onclick="sortTable('clubs',1,'str')">Club</th>
+            <th onclick="sortTable('clubs',2,'str')">Sigla</th>
+            <th onclick="sortTable('clubs',3,'num')">Fuerza</th>
+            <th onclick="sortTable('clubs',4,'str')">País</th>
+            <th onclick="sortTable('clubs',5,'str')">Liga</th>
+            <th onclick="sortTable('clubs',6,'str')">Nivel</th>
+            <th onclick="sortTable('clubs',7,'num')">F. Selección</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-clubs"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination-clubs"></div>
+  </div>
+
+  <!-- PANEL LIGAS -->
+  <div id="panel-leagues" class="panel">
+    <div class="search-box">
+      <div class="search-row">
+        <input type="text" id="search-league" placeholder="🔍 Buscar liga o país...">
+        <select id="filter-league-country"><option value="">🌎 Todos los países</option></select>
+        <select id="filter-league-level"><option value="">📊 Todos los niveles</option></select>
+        <button class="btn-reset" onclick="resetFilters('leagues')">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="results-info" id="leagues-info">Mostrando todas las ligas</div>
+    <div class="table-wrap">
+      <table id="table-leagues">
+        <thead>
+          <tr>
+            <th onclick="sortTable('leagues',0,'num')">#</th>
+            <th onclick="sortTable('leagues',1,'str')">País</th>
+            <th onclick="sortTable('leagues',2,'str')">Liga</th>
+            <th onclick="sortTable('leagues',3,'str')">Nivel</th>
+            <th onclick="sortTable('leagues',4,'num')">N° Clubes</th>
+            <th onclick="sortTable('leagues',5,'num')">Fuerza Prom.</th>
+            <th onclick="sortTable('leagues',6,'num')">F. Máx</th>
+            <th onclick="sortTable('leagues',7,'num')">F. Mín</th>
+            <th onclick="sortTable('leagues',8,'str')">Mejor Club</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-leagues"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PANEL NACIONES -->
+  <div id="panel-nations" class="panel">
+    <div class="search-box">
+      <div class="search-row">
+        <input type="text" id="search-nation" placeholder="🔍 Buscar país...">
+        <select id="filter-continent"><option value="">🌍 Todos los continentes</option></select>
+        <select id="filter-nation-strength">
+          <option value="">💪 Cualquier fuerza</option>
+          <option value="85-99">🥇 Top Mundial (85+)</option>
+          <option value="70-84">🟢 Fuerte (70-84)</option>
+          <option value="50-69">🟡 Medio (50-69)</option>
+          <option value="30-49">🔴 Bajo (30-49)</option>
+          <option value="0-29">⚫ Muy bajo (&lt;30)</option>
+        </select>
+        <button class="btn-reset" onclick="resetFilters('nations')">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="results-info" id="nations-info">Mostrando todas las selecciones</div>
+    <div class="table-wrap">
+      <table id="table-nations">
+        <thead>
+          <tr>
+            <th onclick="sortTable('nations',0,'num')">#</th>
+            <th onclick="sortTable('nations',1,'str')">País</th>
+            <th onclick="sortTable('nations',2,'num')">Fuerza</th>
+            <th onclick="sortTable('nations',3,'str')">Continente</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-nations"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PANEL SIN LIGA -->
+  <div id="panel-noligue" class="panel">
+    <div class="info-box">
+      <h3>📋 Clubes sin Liga Activa</h3>
+      <p>Estos clubes tienen una fuerza válida en el juego pero no están vinculados a ninguna competición jugable. Pueden ser clubes de relleno o de países no implementados activamente.</p>
+    </div>
+    <div class="search-box">
+      <div class="search-row">
+        <input type="text" id="search-noligue" placeholder="🔍 Buscar club sin liga...">
+        <select id="filter-noligue-country"><option value="">🌎 Todos los países</option></select>
+        <select id="filter-noligue-strength">
+          <option value="">💪 Cualquier fuerza</option>
+          <option value="70-99">🟢 Fuerte (70+)</option>
+          <option value="50-69">🟡 Medio (50-69)</option>
+          <option value="30-49">🔴 Bajo (30-49)</option>
+          <option value="0-29">⚫ Muy bajo (&lt;30)</option>
+        </select>
+        <button class="btn-reset" onclick="resetFilters('noligue')">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="results-info" id="noligue-info">Mostrando clubes sin liga</div>
+    <div class="table-wrap">
+      <table id="table-noligue">
+        <thead>
+          <tr>
+            <th onclick="sortTable('noligue',0,'num')">#</th>
+            <th onclick="sortTable('noligue',1,'str')">Club</th>
+            <th onclick="sortTable('noligue',2,'str')">Sigla</th>
+            <th onclick="sortTable('noligue',3,'num')">Fuerza</th>
+            <th onclick="sortTable('noligue',4,'str')">País</th>
+            <th onclick="sortTable('noligue',5,'num')">F. Selección</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-noligue"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination-noligue"></div>
+  </div>
+
+  <!-- PANEL INFO -->
+  <div id="panel-info" class="panel">
+    <div class="info-box">
+      <h3>📖 Sobre esta Wiki v2</h3>
+      <p>Datos extraídos del juego <strong>New Star Soccer</strong> (APK Android, versión v2025b). En esta versión se agregó <strong>Argentina</strong> con ambas divisiones (ARG1 y ARG2) y un nuevo sistema de colores con efecto de brillo para los clubes élite.</p>
+    </div>
+    <div class="info-box">
+      <h3>🎨 Sistema de Colores</h3>
+      <ul style="margin-left: 20px; margin-top: 10px; line-height: 2;">
+        <li><span class="strength-bar strength-elite">90+</span> <strong>Élite</strong> - Dorado con brillo (Real Madrid, Man City, etc.)</li>
+        <li><span class="strength-bar strength-verystrong">80-89</span> <strong>Muy fuerte</strong> - Verde oscuro</li>
+        <li><span class="strength-bar strength-strong">70-79</span> <strong>Fuerte</strong> - Verde claro</li>
+        <li><span class="strength-bar strength-medium">60-69</span> <strong>Medio</strong> - Amarillo/naranja</li>
+        <li><span class="strength-bar strength-low">50-59</span> <strong>Bajo</strong> - Rojo</li>
+        <li><span class="strength-bar strength-weak">&lt;50</span> <strong>Débil</strong> - Gris</li>
+      </ul>
+    </div>
+    <div class="info-box">
+      <h3>🔍 Búsqueda Global</h3>
+      <p>La barra superior busca en <strong>todos los clubes, ligas y selecciones</strong> simultáneamente. Es la forma más rápida de encontrar cualquier equipo.</p>
+    </div>
+    <div class="info-box">
+      <h3>🇦🇷 Novedad: Argentina</h3>
+      <p>Se agregaron todos los clubes argentinos de Primera División (ARG1) y Primera Nacional (ARG2), incluyendo los 5 grandes, clubes históricos y equipos del interior.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>⚽ NSS Wiki v2 | Fan-made para la comunidad de New Star Soccer | Datos v2025b</p>
+  </footer>
+</div>
+
+<script>
+// ============ MAPEO DE BANDERAS POR PAÍS ============
+const countryFlags = {
+  'Spain': '🇪🇸', 'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Germany': '🇩🇪', 'France': '🇫🇷',
+  'Italy': '🇮🇹', 'Netherlands': '🇳🇱', 'Portugal': '🇵🇹', 'Belgium': '🇧🇪',
+  'Denmark': '🇩🇰', 'Brazil': '🇧🇷', 'Mexico': '🇲🇽', 'Turkey': '🇹🇷',
+  'Greece': '🇬🇷', 'Switzerland': '🇨🇭', 'Czech Republic': '🇨🇿', 'Austria': '🇦🇹',
+  'USA': '🇺🇸', 'South Korea': '🇰🇷', 'Argentina': '🇦🇷', 'Poland': '🇵🇱',
+  'Croatia': '🇭🇷', 'Australia': '🇦🇺', 'Norway': '🇳🇴', 'Sweden': '🇸🇪',
+  'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Cyprus': '🇨🇾', 'Japan': '🇯🇵', 'Romania': '🇷🇴',
+  'Hungary': '🇭🇺', 'Chile': '🇨🇱', 'Bulgaria': '🇧🇬', 'Peru': '🇵🇪',
+  'Slovakia': '🇸🇰', 'Morocco': '🇲🇦', 'Egypt': '🇪🇬', 'Israel': '🇮🇱',
+  'Slovenia': '🇸🇮', 'Uruguay': '🇺🇾', 'Kazakhstan': '🇰🇿', 'Paraguay': '🇵🇾',
+  'Colombia': '🇨🇴', 'South Africa': '🇿🇦', 'Ukraine': '🇺🇦', 'Ireland': '🇮🇪',
+  'Serbia': '🇷🇸', 'China': '🇨🇳', 'Algeria': '🇩🇿', 'Venezuela': '🇻🇪',
+  'Saudi Arabia': '🇸🇦', 'Tunisia': '🇹🇳', 'Iran': '🇮🇷', 'Ecuador': '🇪🇨',
+  'Nigeria': '🇳🇬', 'Georgia': '🇬🇪', 'Vietnam': '🇻🇳', 'Bosnia': '🇧🇦',
+  'Thailand': '🇹🇭', 'Costa Rica': '🇨🇷', 'Finland': '🇫🇮', 'Guatemala': '🇬🇹',
+  'Bolivia': '🇧🇴', 'Honduras': '🇭🇳', 'Angola': '🇦🇴', 'Panama': '🇵🇦',
+  'N. Macedonia': '🇲🇰', 'Indonesia': '🇮🇩', 'Qatar': '🇶🇦', 'UAE': '🇦🇪',
+  'Belarus': '🇧🇾', 'Lithuania': '🇱🇹', 'Latvia': '🇱🇻', 'Estonia': '🇪🇪',
+  'Mali': '🇲🇱', 'Montenegro': '🇲🇪', 'Uzbekistan': '🇺🇿', 'Singapore': '🇸🇬',
+  'Kenya': '🇰🇪', 'India': '🇮🇳', 'Nicaragua': '🇳🇮', 'Luxembourg': '🇱🇺',
+  'Northern Ireland': '🇬🇧', 'Wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'El Salvador': '🇸🇻',
+  'Canada': '🇨🇦', 'Jamaica': '🇯🇲', 'Moldova': '🇲🇩', 'Armenia': '🇦🇲',
+  'Kosovo': '🇽🇰', 'Malaysia': '🇲🇾', 'Albania': '🇦🇱', 'Iceland': '🇮🇸',
+  'Azerbaijan': '🇦🇿', 'Trinidad & Tobago': '🇹🇹', 'Malta': '🇲🇹',
+  'Botswana': '🇧🇼', 'Namibia': '🇳🇦', 'Zambia': '🇿🇲', 'Uganda': '🇺🇬',
+  'Tanzania': '🇹🇿', 'Ghana': '🇬🇭', 'Suriname': '🇸🇷', 'Faroe Islands': '🇫🇴',
+  'Haiti': '🇭🇹', 'Aruba': '🇦🇼', 'Bahrain': '🇧🇭', 'Iraq': '🇮🇶',
+  'Sudan': '🇸🇩', 'Andorra': '🇦🇩', 'Belize': '🇧🇿', 'Gibraltar': '🇬🇮',
+  'Philippines': '🇵🇭', 'Seychelles': '🇸🇨', 'San Marino': '🇸🇲',
+  'Dominican Republic': '🇩🇴', 'St Kitts & Nevis': '🇰🇳', 'Afghanistan': '🇦🇫',
+  'Russia': '🇷🇺', 'New Zealand': '🇳🇿', 'Puerto Rico': '🇵🇷'
+};
+
+const getFlag = (country) => countryFlags[country] || '🏳️';
+
+// ============ NUEVA FUNCIÓN DE COLORES ============
+function getStrengthClass(v) {
+  if (v >= 90) return 'strength-elite';      // Dorado con brillo
+  if (v >= 80) return 'strength-verystrong';  // Verde oscuro
+  if (v >= 70) return 'strength-strong';      // Verde claro
+  if (v >= 60) return 'strength-medium';      // Amarillo/naranja
+  if (v >= 50) return 'strength-low';         // Rojo
+  if (v >= 40) return 'strength-weak';        // Gris
+  return 'strength-veryweak';                 // Gris oscuro
+}
+
+// ============ DATOS ============
+// Clubes principales (top mundial + ARGENTINA completa)
+const clubsData = [
+[1,"Real Madrid","MADRID",99,"Spain","ESP1","1ª división",96],
+[2,"Man City","MAN C",98,"England","ENG PR","1ª división",93],
+[3,"Liverpool","L'POOL",98,"England","ENG PR","1ª división",93],
+[4,"Barcelona","BARÇA",97,"Spain","ESP1","1ª división",96],
+[5,"Bayern","BAYERN",97,"Germany","GER1","1ª división",95],
+[6,"Arsenal","ARSNL",97,"England","ENG PR","1ª división",93],
+[7,"Bayer Leverkusen","BAYER",95,"Germany","GER1","1ª división",95],
+[8,"Atlético","ATMAD",95,"Spain","ESP1","1ª división",96],
+[9,"PSG","PSG",95,"France","FRA1","1ª división",81],
+[10,"Inter Milan","INTER",95,"Italy","ITA A","1ª división",89],
+[11,"Juventus","TURIN J",93,"Italy","ITA A","1ª división",89],
+[12,"Tottenham","SPURS",93,"England","ENG PR","1ª división",93],
+[13,"Aston Villa","A VILLA",93,"England","ENG PR","1ª división",93],
+[14,"Dortmund","DORTMU",93,"Germany","GER1","1ª división",95],
+[15,"RB Leipzig","RB LZG",91,"Germany","GER1","1ª división",95],
+[16,"Atalanta","ATALAN",91,"Italy","ITA A","1ª división",89],
+[17,"Milan","MILAN",91,"Italy","ITA A","1ª división",89],
+[18,"Girona","GIRONA",91,"Spain","ESP1","1ª división",96],
+[19,"Ajax","AJAX",91,"Netherlands","NED1","1ª división",85],
+[20,"Chelsea","CHELS",90,"England","ENG PR","1ª división",93],
+[21,"Athletic","ATHBIL",90,"Spain","ESP1","1ª división",96],
+[22,"Benfica","BENFCA",89,"Portugal","POR1","1ª división",90],
+[23,"Real Sociedad","REALSO",89,"Spain","ESP1","1ª división",96],
+[24,"PSV","PSV",89,"Netherlands","NED1","1ª división",85],
+[25,"Crystal Palace","PALACE",89,"England","ENG PR","1ª división",93],
+[26,"Bologna","BOLOGN",89,"Italy","ITA A","1ª división",89],
+[27,"Frankfurt","FRANKF",89,"Germany","GER1","1ª división",95],
+[28,"Roma","ROMA",89,"Italy","ITA A","1ª división",89],
+[29,"Newcastle","NEWCAS",89,"England","ENG PR","1ª división",93],
+[30,"Sporting","SCP",88,"Portugal","POR1","1ª división",90],
+[31,"Porto","PORTO",88,"Portugal","POR1","1ª división",90],
+[32,"Stuttgart","STUTTG",88,"Germany","GER1","1ª división",95],
+[33,"Betis","BETIS",87,"Spain","ESP1","1ª división",96],
+[34,"Fiorentina","FIOREN",87,"Italy","ITA A","1ª división",89],
+[35,"Brighton","BRGHTN",87,"England","ENG PR","1ª división",93],
+[36,"Villarreal","VILLAR",86,"Spain","ESP1","1ª división",96],
+[37,"Lazio","LAZIO",86,"Italy","ITA A","1ª división",89],
+[38,"Napoli","NAPOLI",86,"Italy","ITA A","1ª división",89],
+[39,"Galatasaray","GALA",85,"Turkey","TUR1","1ª división",71],
+[40,"Valencia","VALENC",85,"Spain","ESP1","1ª división",96],
+[41,"Man United","MAN U",85,"England","ENG PR","1ª división",93],
+[42,"Lille","LILLE",85,"France","FRA1","1ª división",81],
+[43,"Feyenoord","FEYENO",85,"Netherlands","NED1","1ª división",85],
+[44,"Udinese","UDINES",85,"Italy","ITA A","1ª división",89],
+[45,"Torino","TORINO",84,"Italy","ITA A","1ª división",89],
+[46,"Saint-Giloise","U ST-G",84,"Belgium","BEL1","1ª división",63],
+[47,"Freiburg","FREIBU",84,"Germany","GER1","1ª división",95],
+[48,"Bournemouth","BMOUTH",83,"England","ENG PR","1ª división",93],
+[49,"Getafe","GETAFE",83,"Spain","ESP1","1ª división",96],
+[50,"Marseille","O MARS",83,"France","FRA1","1ª división",81],
+// ... (resto de top 100 mundial)
+[77,"Leicester","LEIC",79,"England","ENG CH","2ª división",93],
+[100,"Midtjylland","FC MYD",77,"Denmark","DEN1","1ª división",83],
+[124,"River Plate","RIVER",75,"Argentina","ARG1","1ª división",86],
+[125,"Boca Juniors","BOCA",75,"Argentina","ARG1","1ª división",86],
+[172,"Estudiantes","ESTUDI",72,"Argentina","ARG1","1ª división",86],
+[199,"Independiente","INDEPE",71,"Argentina","ARG1","1ª división",86],
+[201,"Rosario Central","ROSCEN",70,"Argentina","ARG1","1ª división",86],
+[202,"Belgrano","BELGRA",70,"Argentina","ARG1","1ª división",86],
+[207,"San Lorenzo","SANLOR",70,"Argentina","ARG1","1ª división",86],
+[275,"Lanus","LANUS",68,"Argentina","ARG1","1ª división",86],
+[288,"Godoy Cruz","GODOY",67,"Argentina","ARG1","1ª división",86],
+[311,"Racing","RACING",66,"Argentina","ARG1","1ª división",86],
+[321,"Gimnasia (LP)","GIMNLP",65,"Argentina","ARG1","1ª división",86],
+[347,"Banfield","BANFLD",64,"Argentina","ARG1","1ª división",86],
+[366,"Newell's","NEWEOB",64,"Argentina","ARG1","1ª división",86],
+[374,"Unión","UNIÓN",63,"Argentina","ARG1","1ª división",86],
+[394,"Argentinos Juniors","ARGJUN",62,"Argentina","ARG1","1ª división",86],
+[435,"Vélez","VÉLEZ",61,"Argentina","ARG1","1ª división",86],
+[436,"Sarmiento","SRMNTO",61,"Argentina","ARG1","1ª división",86],
+[451,"Tigre","TIGRE",60,"Argentina","ARG1","1ª división",86],
+[452,"Defensa y Justicia","DEFJUS",60,"Argentina","ARG1","1ª división",86],
+[490,"Huracán","HURACA",60,"Argentina","ARG1","1ª división",86],
+[570,"Tucumán","TCUMÁN",58,"Argentina","ARG1","1ª división",86],
+[607,"Talleres","TALLER",57,"Argentina","ARG1","1ª división",86],
+[777,"Central Córdoba","CC SDE",53,"Argentina","ARG1","1ª división",86],
+[893,"Rivadavia","RIVADA",50,"Argentina","ARG1","1ª división",86],
+[930,"San Martín (SJ)","SMSJUA",50,"Argentina","ARG1","1ª división",86],
+[944,"Aldosivi","ALDOSI",49,"Argentina","ARG1","1ª división",86],
+[984,"Riestra","RIESTR",49,"Argentina","ARG1","1ª división",86],
+[994,"Barracas","BRRACA",48,"Argentina","ARG1","1ª división",86],
+[1051,"Instituto","IAC COR",47,"Argentina","ARG1","1ª división",86],
+[1060,"Platense","CA PLAT",47,"Argentina","ARG1","1ª división",86],
+// ARG2 - Primera Nacional
+[135,"Valladolid","VALLAD",75,"Spain","ESP2","2ª división",96],
+[927,"Quilmes","QUILME",50,"Argentina","ARG2A","2ª división",86],
+[1166,"Temperley","TEMPER",45,"Argentina","ARG2B","2ª división",86],
+[1198,"Colón","COLÓN",45,"Argentina","ARG2B","2ª división",86],
+[1215,"All Boys","ALLBOY",38,"Argentina","ARG2A","2ª división",86],
+[1274,"Gimnasia (JU)","GIMJUJ",43,"Argentina","ARG2B","2ª división",86],
+[1363,"San Martín (TU)","SMTUCU",42,"Argentina","ARG2A","2ª división",86],
+[1369,"Patronato","PATRON",41,"Argentina","ARG2A","2ª división",86],
+[1526,"Nueva Chicago","NUEVAC",40,"Argentina","ARG2B","2ª división",86],
+[1641,"Almirante Brown","ALMBRO",39,"Argentina","ARG2B","2ª división",86],
+[1652,"Ferro","FERRO",38,"Argentina","ARG2A","2ª división",86],
+[1653,"Guëmes","GÜEMES",38,"Argentina","ARG2A","2ª división",86],
+[1690,"Chacarita Juniors","CHACAR",38,"Argentina","ARG2B","2ª división",86],
+[1691,"All Boys","ALLBOY",38,"Argentina","ARG2A","2ª división",86],
+[1728,"Alvarado","ALVRDO",37,"Argentina","ARG2A","2ª división",86],
+[1788,"San Miguel","S MGUEL",36,"Argentina","ARG2A","2ª división",86],
+[1789,"Mitre (SdE)","MITRE",36,"Argentina","ARG2B","2ª división",86],
+[1790,"Racing","RACNG C",36,"Argentina","ARG2A","2ª división",86],
+[1791,"Madryn","MADRYN",36,"Argentina","ARG2A","2ª división",86],
+[1792,"Tristán Suárez","SUÁREZ",36,"Argentina","ARG2A","2ª división",86],
+[1793,"Chaco For Ever","CHACO",36,"Argentina","ARG2B","2ª división",86],
+[1794,"Talleres (RdE)","TLL RDE",36,"Argentina","ARG2B","2ª división",86],
+[1796,"San Telmo","S TELMO",36,"Argentina","ARG2B","2ª división",86],
+[1797,"Gimnasia y Tiro","G Y TIRO",36,"Argentina","ARG2A","2ª división",86],
+[1798,"Maipú","MAIPÚ",36,"Argentina","ARG2A","2ª división",86],
+[1799,"Almagro","ALMGRO",36,"Argentina","ARG2A","2ª división",86],
+[1876,"Defensores Unidos","ZÁRATE",35,"Argentina","ARG2B","2ª división",86],
+[1918,"Los Andes","L ANDES",35,"Argentina","ARG2A","2ª división",86],
+[1945,"Deportivo Morón","MORÓN",35,"Argentina","ARG2B","2ª división",86],
+[2127,"Estudiantes BA","ESTU BA",34,"Argentina","ARG2B","2ª división",86],
+[2414,"Colegiales","COLEGI",30,"Argentina","ARG2A","2ª división",86],
+[2415,"Central Norte","C NORTE",30,"Argentina","ARG2B","2ª división",86],
+[2450,"Agropecuario","AGROPE",30,"Argentina","ARG2B","2ª división",86],
+[2495,"Gimnasia y Esgrima (M)","GIM(M)",30,"Argentina","ARG2B","2ª división",86],
+[2504,"Defensores","DFNSOR",30,"Argentina","ARG2B","2ª división",86],
+[2615,"Estudiantes (RC)","EST RC",30,"Argentina","ARG2B","2ª división",86],
+[3110,"Atlanta","ATLANT",24,"Argentina","ARG2A","2ª división",86],
+];
+
+// Ligas (incluye Argentina)
+const leaguesData = [
+[1,"England","ENG PR","1",20,85.2,98,75,"Man City"],
+[2,"Italy","ITA A","1",20,84,95,75,"Inter Milan"],
+[3,"Spain","ESP1","1",20,84,99,67,"Real Madrid"],
+[4,"Germany","GER1","1",18,82.2,97,73,"Bayern"],
+[5,"France","FRA1","1",18,74.7,95,64,"PSG"],
+[23,"Argentina","ARG1","1",30,61.1,75,47,"River Plate"],
+[16,"Spain","ESP2","2",22,64.8,75,43,"Valladolid"],
+[111,"Argentina","ARG2A","2",18,37.2,50,24,"Quilmes"],
+[127,"Argentina","ARG2B","2",18,36,45,30,"Temperley"],
+[6,"Belgium","BEL1","1",16,70.4,84,57,"Saint-Giloise"],
+[7,"Denmark","DEN1","1",12,69.5,80,57,"FC København"],
+[8,"Netherlands","NED1","1",18,69.3,91,55,"Ajax"],
+[9,"Brazil","BRA1","1",20,69,78,59,"Palmeiras"],
+[10,"Mexico","MEX1","1",18,68,77,58,"Cruz Azul"],
+];
+
+// Selecciones
+const nationsData = [
+[1,"Spain",96,"Europe"],[2,"Germany",95,"Europe"],[3,"England",93,"Europe"],
+[4,"Uruguay",93,"South America"],[5,"Portugal",90,"Europe"],[6,"Italy",89,"Europe"],
+[7,"Argentina",86,"South America"],[8,"Netherlands",85,"Europe"],
+[9,"Croatia",84,"Europe"],[10,"Denmark",83,"Europe"],[11,"Brazil",83,"South America"],
+[19,"Colombia",75,"South America"],[25,"Paraguay",73,"South America"],
+[33,"Peru",70,"South America"],[34,"Chile",81,"South America"],
+];
+
+// Sin liga
+const noligueData = [
+[1,"Zenit","ZENIT",79,"Russia",81],
+[2,"Xerez","XEREZ",75,"Spain",96],
+[3,"Vaslui","VASLUI",74,"Romania",63],
+];
+
+// ============ LÓGICA ============
+const PAGE_SIZE = 50;
+let currentPage = { clubs: 1, noligue: 1 };
+let sortState = { clubs: null, leagues: null, nations: null, noligue: null };
+let filteredData = { clubs: [], leagues: [], nations: [], noligue: [] };
+
+function getRankClass(r) {
+  if (r === 1) return 'rank-1';
+  if (r === 2) return 'rank-2';
+  if (r === 3) return 'rank-3';
+  return '';
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(tab));
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function highlightText(text, query) {
+  if (!query) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return String(text).replace(regex, '<span class="highlight">$1</span>');
+}
+
+// ============ BÚSQUEDA GLOBAL ============
+document.getElementById('global-search').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  const results = document.getElementById('global-results');
+  
+  if (!q) { results.classList.remove('active'); return; }
+  
+  const allResults = [];
+  
+  clubsData.forEach(c => {
+    if (c[1].toLowerCase().includes(q) || c[2].toLowerCase().includes(q)) {
+      allResults.push({type:'club', data:c});
+    }
+  });
+  
+  leaguesData.forEach(l => {
+    if (l[1].toLowerCase().includes(q) || l[2].toLowerCase().includes(q)) {
+      allResults.push({type:'liga', data:l});
+    }
+  });
+  
+  nationsData.forEach(n => {
+    if (n[1].toLowerCase().includes(q)) {
+      allResults.push({type:'seleccion', data:n});
+    }
+  });
+  
+  if (allResults.length === 0) {
+    results.innerHTML = '<div class="global-result-item">🔍 No se encontraron resultados</div>';
+  } else {
+    results.innerHTML = allResults.slice(0, 15).map(r => {
+      const d = r.data;
+      let html = `<span class="country-flag">${getFlag(d[4]||d[1])}</span>`;
+      
+      if (r.type === 'club') {
+        html += `<strong>${highlightText(d[1], q)}</strong>`;
+        html += `<span class="result-strength ${getStrengthClass(d[3])}">${d[3]}</span>`;
+      } else if (r.type === 'liga') {
+        html += `<strong>${highlightText(d[2], q)}</strong> (${d[1]})`;
+        html += `<span class="result-strength ${getStrengthClass(d[5])}">${d[5]}</span>`;
+      } else {
+        html += `<strong>${highlightText(d[1], q)}</strong> (Selección)`;
+        html += `<span class="result-strength ${getStrengthClass(d[2])}">${d[2]}</span>`;
+      }
+      
+      return `<div class="global-result-item">${html}</div>`;
+    }).join('');
+  }
+  
+  results.classList.add('active');
+});
+
+// ============ FILTROS CLUBES ============
+function filterClubs() {
+  const q = document.getElementById('search-club').value.toLowerCase();
+  const country = document.getElementById('filter-country').value;
+  const league = document.getElementById('filter-league').value;
+  const level = document.getElementById('filter-level').value;
+  const strength = document.getElementById('filter-strength').value;
+  
+  filteredData.clubs = clubsData.filter(c => {
+    if (q && !c[1].toLowerCase().includes(q) && !c[2].toLowerCase().includes(q)) return false;
+    if (country && c[4] !== country) return false;
+    if (league && c[5] !== league) return false;
+    if (level && c[6] !== level) return false;
+    if (strength) {
+      const [min, max] = strength.split('-').map(Number);
+      if (c[3] < min || c[3] > max) return false;
+    }
+    return true;
+  });
+  
+  currentPage.clubs = 1;
+  renderClubs();
+}
+
+function renderClubs() {
+  const tbody = document.getElementById('tbody-clubs');
+  const start = (currentPage.clubs - 1) * PAGE_SIZE;
+  const pageData = filteredData.clubs.slice(start, start + PAGE_SIZE);
+  const q = document.getElementById('search-club').value;
+  
+  if (pageData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="no-results">🔍 No se encontraron clubes</td></tr>';
+  } else {
+    tbody.innerHTML = pageData.map(c => `
+      <tr>
+        <td class="rank-cell ${getRankClass(c[0])}">${c[0]}</td>
+        <td><strong>${highlightText(c[1], q)}</strong></td>
+        <td>${highlightText(c[2], q)}</td>
+        <td><span class="strength-bar ${getStrengthClass(c[3])}">${c[3]}</span></td>
+        <td><span class="country-badge"><span class="country-flag">${getFlag(c[4])}</span>${c[4]}</span></td>
+        <td><span class="league-tag"><span class="country-flag">${getFlag(c[4])}</span>${c[5]}</span></td>
+        <td>${c[6]}</td>
+        <td><span class="strength-bar ${getStrengthClass(c[7])}">${c[7]}</span></td>
+      </tr>
+    `).join('');
+  }
+  
+  document.getElementById('clubs-info').textContent = 
+    `Mostrando ${Math.min(start+1, filteredData.clubs.length)}-${Math.min(start+PAGE_SIZE, filteredData.clubs.length)} de ${filteredData.clubs.length} clubes`;
+  
+  renderPagination('clubs');
+}
+
+function renderPagination(tab) {
+  const pag = document.getElementById('pagination-' + tab);
+  const total = filteredData[tab].length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const cur = currentPage[tab];
+  
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
+  
+  let html = `<button ${cur===1?'disabled':''} onclick="goToPage('${tab}',1)">⏮</button>`;
+  html += `<button ${cur===1?'disabled':''} onclick="goToPage('${tab}',${cur-1})">◀</button>`;
+  html += `<span>Página ${cur} de ${totalPages}</span>`;
+  html += `<button ${cur===totalPages?'disabled':''} onclick="goToPage('${tab}',${cur+1})">▶</button>`;
+  html += `<button ${cur===totalPages?'disabled':''} onclick="goToPage('${tab}',${totalPages})">⏭</button>`;
+  pag.innerHTML = html;
+}
+
+function goToPage(tab, p) {
+  currentPage[tab] = p;
+  if (tab === 'clubs') renderClubs();
+  else if (tab === 'noligue') renderNoligue();
+}
+
+function filterLeagues() {
+  const q = document.getElementById('search-league').value.toLowerCase();
+  const country = document.getElementById('filter-league-country').value;
+  const level = document.getElementById('filter-league-level').value;
+  
+  filteredData.leagues = leaguesData.filter(l => {
+    if (q && !l[1].toLowerCase().includes(q) && !l[2].toLowerCase().includes(q)) return false;
+    if (country && l[1] !== country) return false;
+    if (level && l[3] !== level) return false;
+    return true;
+  });
+  renderLeagues();
+}
+
+function renderLeagues() {
+  const tbody = document.getElementById('tbody-leagues');
+  const q = document.getElementById('search-league').value;
+  
+  if (filteredData.leagues.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="no-results">🔍 No se encontraron ligas</td></tr>';
+  } else {
+    tbody.innerHTML = filteredData.leagues.map(l => `
+      <tr>
+        <td class="rank-cell ${getRankClass(l[0])}">${l[0]}</td>
+        <td><span class="country-badge"><span class="country-flag">${getFlag(l[1])}</span>${highlightText(l[1], q)}</span></td>
+        <td><span class="league-tag"><span class="country-flag">${getFlag(l[1])}</span>${highlightText(l[2], q)}</span></td>
+        <td>${l[3]}</td>
+        <td>${l[4]}</td>
+        <td><span class="strength-bar ${getStrengthClass(l[5])}">${l[5]}</span></td>
+        <td><span class="strength-bar ${getStrengthClass(l[6])}">${l[6]}</span></td>
+        <td><span class="strength-bar ${getStrengthClass(l[7])}">${l[7]}</span></td>
+        <td><strong>${l[8]}</strong></td>
+      </tr>
+    `).join('');
+  }
+  
+  document.getElementById('leagues-info').textContent = 
+    `Mostrando ${filteredData.leagues.length} de ${leaguesData.length} ligas`;
+}
+
+function filterNations() {
+  const q = document.getElementById('search-nation').value.toLowerCase();
+  const continent = document.getElementById('filter-continent').value;
+  const strength = document.getElementById('filter-nation-strength').value;
+  
+  filteredData.nations = nationsData.filter(n => {
+    if (q && !n[1].toLowerCase().includes(q)) return false;
+    if (continent && n[3] !== continent) return false;
+    if (strength) {
+      const [min, max] = strength.split('-').map(Number);
+      if (n[2] < min || n[2] > max) return false;
+    }
+    return true;
+  });
+  renderNations();
+}
+
+function renderNations() {
+  const tbody = document.getElementById('tbody-nations');
+  const q = document.getElementById('search-nation').value;
+  
+  if (filteredData.nations.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="no-results">🔍 No se encontraron selecciones</td></tr>';
+  } else {
+    tbody.innerHTML = filteredData.nations.map(n => `
+      <tr>
+        <td class="rank-cell ${getRankClass(n[0])}">${n[0]}</td>
+        <td><span class="country-badge"><span class="country-flag">${getFlag(n[1])}</span><strong>${highlightText(n[1], q)}</strong></span></td>
+        <td><span class="strength-bar ${getStrengthClass(n[2])}">${n[2]}</span></td>
+        <td><span class="country-badge">${n[3]}</span></td>
+      </tr>
+    `).join('');
+  }
+  
+  document.getElementById('nations-info').textContent = 
+    `Mostrando ${filteredData.nations.length} de ${nationsData.length} selecciones`;
+}
+
+function filterNoligue() {
+  const q = document.getElementById('search-noligue').value.toLowerCase();
+  const country = document.getElementById('filter-noligue-country').value;
+  const strength = document.getElementById('filter-noligue-strength').value;
+  
+  filteredData.noligue = noligueData.filter(n => {
+    if (q && !n[1].toLowerCase().includes(q) && !n[2].toLowerCase().includes(q)) return false;
+    if (country && n[4] !== country) return false;
+    if (strength) {
+      const [min, max] = strength.split('-').map(Number);
+      if (n[3] < min || n[3] > max) return false;
+    }
+    return true;
+  });
+  
+  currentPage.noligue = 1;
+  renderNoligue();
+}
+
+function renderNoligue() {
+  const tbody = document.getElementById('tbody-noligue');
+  const start = (currentPage.noligue - 1) * PAGE_SIZE;
+  const pageData = filteredData.noligue.slice(start, start + PAGE_SIZE);
+  const q = document.getElementById('search-noligue').value;
+  
+  if (pageData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="no-results">🔍 No se encontraron clubes</td></tr>';
+  } else {
+    tbody.innerHTML = pageData.map(n => `
+      <tr>
+        <td class="rank-cell">${n[0]}</td>
+        <td><strong>${highlightText(n[1], q)}</strong></td>
+        <td>${highlightText(n[2], q)}</td>
+        <td><span class="strength-bar ${getStrengthClass(n[3])}">${n[3]}</span></td>
+        <td><span class="country-badge"><span class="country-flag">${getFlag(n[4])}</span>${n[4]}</span></td>
+        <td><span class="strength-bar ${getStrengthClass(n[5])}">${n[5]}</span></td>
+      </tr>
+    `).join('');
+  }
+  
+  document.getElementById('noligue-info').textContent = 
+    `Mostrando ${Math.min(start+1, filteredData.noligue.length)}-${Math.min(start+PAGE_SIZE, filteredData.noligue.length)} de ${filteredData.noligue.length} clubes`;
+  
+  renderPagination('noligue');
+}
+
+function sortTable(tab, colIdx, type) {
+  const table = document.getElementById('table-' + tab);
+  const ths = table.querySelectorAll('th');
+  
+  const currentSort = sortState[tab];
+  let direction = 'asc';
+  if (currentSort && currentSort.col === colIdx) {
+    direction = currentSort.dir === 'asc' ? 'desc' : 'asc';
+  }
+  
+  ths.forEach(th => th.classList.remove('sorted-asc','sorted-desc'));
+  ths[colIdx].classList.add('sorted-' + direction);
+  
+  sortState[tab] = { col: colIdx, dir: direction };
+  
+  const dataArr = filteredData[tab] || [];
+  dataArr.sort((a,b) => {
+    let va = a[colIdx], vb = b[colIdx];
+    if (type === 'num') {
+      va = Number(va); vb = Number(vb);
+      return direction === 'asc' ? va - vb : vb - va;
+    } else {
+      va = String(va).toLowerCase();
+      vb = String(vb).toLowerCase();
+      return direction === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    }
+  });
+  
+  if (tab === 'clubs') { currentPage.clubs = 1; renderClubs(); }
+  else if (tab === 'leagues') renderLeagues();
+  else if (tab === 'nations') renderNations();
+  else if (tab === 'noligue') { currentPage.noligue = 1; renderNoligue(); }
+}
+
+function resetFilters(tab) {
+  if (tab === 'clubs') {
+    document.getElementById('search-club').value = '';
+    document.getElementById('filter-country').value = '';
+    document.getElementById('filter-league').value = '';
+    document.getElementById('filter-level').value = '';
+    document.getElementById('filter-strength').value = '';
+    filterClubs();
+  } else if (tab === 'leagues') {
+    document.getElementById('search-league').value = '';
+    document.getElementById('filter-league-country').value = '';
+    document.getElementById('filter-league-level').value = '';
+    filterLeagues();
+  } else if (tab === 'nations') {
+    document.getElementById('search-nation').value = '';
+    document.getElementById('filter-continent').value = '';
+    document.getElementById('filter-nation-strength').value = '';
+    filterNations();
+  } else if (tab === 'noligue') {
+    document.getElementById('search-noligue').value = '';
+    document.getElementById('filter-noligue-country').value = '';
+    document.getElementById('filter-noligue-strength').value = '';
+    filterNoligue();
+  }
+}
+
+function populateFilters() {
+  const countries = [...new Set(clubsData.map(c => c[4]))].sort();
+  const countrySelect = document.getElementById('filter-country');
+  countries.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; 
+    opt.innerHTML = `${getFlag(c)} ${c}`;
+    countrySelect.appendChild(opt);
+  });
+  
+  const leagues = [...new Set(clubsData.map(c => c[5]))].sort();
+  const leagueSelect = document.getElementById('filter-league');
+  leagues.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l; opt.textContent = l;
+    leagueSelect.appendChild(opt);
+  });
+  
+  const levels = [...new Set(clubsData.map(c => c[6]))].sort();
+  const levelSelect = document.getElementById('filter-level');
+  levels.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l; opt.textContent = l;
+    levelSelect.appendChild(opt);
+  });
+  
+  const leagueCountries = [...new Set(leaguesData.map(l => l[1]))].sort();
+  const lcSelect = document.getElementById('filter-league-country');
+  leagueCountries.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; 
+    opt.innerHTML = `${getFlag(c)} ${c}`;
+    lcSelect.appendChild(opt);
+  });
+  
+  const leagueLevels = [...new Set(leaguesData.map(l => l[3]))].sort();
+  const llSelect = document.getElementById('filter-league-level');
+  leagueLevels.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l; opt.textContent = 'Nivel ' + l;
+    llSelect.appendChild(opt);
+  });
+  
+  const continents = [...new Set(nationsData.map(n => n[3]))].sort();
+  const contSelect = document.getElementById('filter-continent');
+  continents.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    contSelect.appendChild(opt);
+  });
+  
+  const noligueCountries = [...new Set(noligueData.map(n => n[4]))].sort();
+  const nlcSelect = document.getElementById('filter-noligue-country');
+  noligueCountries.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; 
+    opt.innerHTML = `${getFlag(c)} ${c}`;
+    nlcSelect.appendChild(opt);
+  });
+}
+
+// Event listeners
+document.getElementById('search-club').addEventListener('input', filterClubs);
+document.getElementById('filter-country').addEventListener('change', filterClubs);
+document.getElementById('filter-league').addEventListener('change', filterClubs);
+document.getElementById('filter-level').addEventListener('change', filterClubs);
+document.getElementById('filter-strength').addEventListener('change', filterClubs);
+document.getElementById('search-league').addEventListener('input', filterLeagues);
+document.getElementById('filter-league-country').addEventListener('change', filterLeagues);
+document.getElementById('filter-league-level').addEventListener('change', filterLeagues);
+document.getElementById('search-nation').addEventListener('input', filterNations);
+document.getElementById('filter-continent').addEventListener('change', filterNations);
+document.getElementById('filter-nation-strength').addEventListener('change', filterNations);
+document.getElementById('search-noligue').addEventListener('input', filterNoligue);
+document.getElementById('filter-noligue-country').addEventListener('change', filterNoligue);
+document.getElementById('filter-noligue-strength').addEventListener('change', filterNoligue);
+
+// INIT
+function init() {
+  const argCount = clubsData.filter(c => c[4] === 'Argentina').length;
+  document.getElementById('stat-clubs').textContent = clubsData.length;
+  document.getElementById('stat-arg').textContent = argCount;
+  document.getElementById('stat-leagues').textContent = leaguesData.length;
+  document.getElementById('stat-nations').textContent = nationsData.length;
+  
+  populateFilters();
+  
+  filteredData.clubs = [...clubsData];
+  filteredData.leagues = [...leaguesData];
+  filteredData.nations = [...nationsData];
+  filteredData.noligue = [...noligueData];
+  
+  renderClubs();
+  renderLeagues();
+  renderNations();
+  renderNoligue();
+}
+
+init();
+</script>
+</body>
+</html>
