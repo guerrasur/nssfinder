@@ -5,689 +5,741 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NSS Finder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #060d08;
-    --surface: rgba(10,20,12,0.85);
-    --surface2: rgba(15,28,17,0.95);
-    --border: rgba(34,197,94,0.18);
-    --accent: #22c55e;
-    --accent2: #86efac;
-    --text: #e8f5e9;
-    --muted: #6b9975;
-    --green: #22c55e;
-    --yellow: #eab308;
-    --red: #ef4444;
-    --blue: #00d4ff;
-  }
+:root {
+  --bg: #f5f5f0;
+  --bg2: #eeede8;
+  --surface: #ffffff;
+  --surface2: #f0f0eb;
+  --border: #d8d8d0;
+  --border-strong: #b8b8b0;
+  --accent: #1a7a3c;
+  --accent-light: #e8f5ee;
+  --accent-mid: #2d9e52;
+  --text: #111111;
+  --text2: #444444;
+  --muted: #888880;
+  --red: #c0392b;
+  --yellow: #c07a00;
+  --orange: #b85c00;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+[data-theme="dark"] {
+  --bg: #111110;
+  --bg2: #1a1a18;
+  --surface: #1e1e1c;
+  --surface2: #242422;
+  --border: #2e2e2a;
+  --border-strong: #3e3e3a;
+  --accent: #2d9e52;
+  --accent-light: rgba(45,158,82,0.12);
+  --accent-mid: #3dbb63;
+  --text: #f0f0ec;
+  --text2: #aaaaaa;
+  --muted: #666660;
+  --red: #e05a4a;
+  --yellow: #d4a017;
+  --orange: #d07030;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-  }
+.theme-toggle {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 16px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
-  /* PITCH BACKGROUND */
-  .pitch-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background:
-      /* Night sky gradient */
-      linear-gradient(180deg, #010a03 0%, #020e05 30%, #041408 60%, #060d08 100%);
-    pointer-events: none;
-  }
-  /* Pitch stripes via SVG background */
-  .pitch-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='rgba(34,197,94,0.02)'/%3E%3Cstop offset='50%25' stop-color='rgba(34,197,94,0.04)'/%3E%3Cstop offset='100%25' stop-color='rgba(34,197,94,0.02)'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3C/svg%3E");
-    background-size: cover;
-  }
-  .pitch-svg {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120%;
-    max-width: 1600px;
-    opacity: 0.07;
-  }
+.str-elite {
+  background: linear-gradient(90deg, #c8960c, #f5d020, #f6b900, #e8a800, #f5d020, #c8960c);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gold-shimmer 3s linear infinite;
+}
+@keyframes gold-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 300% center; }
+}
+tbody tr.strong-row { background: rgba(26,122,60,0.04); }
+.club-carta.elite-carta { border-color: rgba(212,175,55,0.35); }
+.club-carta.elite-carta:hover { border-color: rgba(212,175,55,0.65); }
 
-  /* Floodlights glow */
-  .light-left, .light-right {
-    position: absolute;
-    top: 0;
-    width: 40%;
-    height: 60%;
-    pointer-events: none;
-    border-radius: 50%;
-    filter: blur(80px);
-  }
-  .light-left {
-    left: -10%;
-    background: radial-gradient(ellipse, rgba(200,255,200,0.06) 0%, transparent 70%);
-  }
-  .light-right {
-    right: -10%;
-    background: radial-gradient(ellipse, rgba(200,255,200,0.06) 0%, transparent 70%);
-  }
+[data-theme="dark"] .info-callout { background: rgba(212,175,55,0.08); border-color: var(--yellow); color: var(--text2); }
 
-  /* All content above bg */
-  header, .hero, .tabs-bar, .content, footer { position: relative; z-index: 1; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* HEADER */
-  header {
-    background: rgba(2,10,4,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 58px;
-  }
-  .logo {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 26px;
-    letter-spacing: 1px;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo-ball { font-size: 22px; }
-  .logo span { color: var(--accent); }
-  .header-badge {
-    background: rgba(34,197,94,0.08);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .header-badge b { color: var(--accent); }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
 
-  /* HERO */
-  .hero {
-    padding: 52px 24px 44px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
-  }
-  .hero h1 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: clamp(42px, 7vw, 80px);
-    line-height: 1;
-    letter-spacing: -1px;
-    margin-bottom: 14px;
-    text-shadow: 0 0 40px rgba(34,197,94,0.3);
-  }
-  .hero h1 .highlight { color: var(--accent); }
-  .hero p {
-    color: var(--muted);
-    max-width: 560px;
-    margin: 0 auto 32px;
-    line-height: 1.6;
-    font-size: 15px;
-  }
-  .hero-stats {
-    display: flex;
-    gap: 0;
-    justify-content: center;
-    flex-wrap: wrap;
-    background: rgba(34,197,94,0.05);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    max-width: 560px;
-    margin: 0 auto;
-    overflow: hidden;
-  }
-  .hero-stat {
-    flex: 1;
-    min-width: 100px;
-    padding: 16px 12px;
-    border-right: 1px solid var(--border);
-  }
-  .hero-stat:last-child { border-right: none; }
-  .hero-stat .num {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 30px;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .hero-stat .lbl {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--text);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+}
+.logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  letter-spacing: 1px;
+  color: var(--text);
+  text-transform: uppercase;
+}
+.logo span { color: var(--accent); }
+.header-badge {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
 
-  /* TABS */
-  .tabs-bar {
-    background: rgba(2,10,4,0.8);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 58px;
-    z-index: 90;
-  }
-  .tabs {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 24px;
-    display: flex;
-    gap: 2px;
-  }
-  .tab-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    padding: 14px 20px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    position: relative;
-    top: 1px;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+/* ── HERO (minimal) ── */
+.hero {
+  border-bottom: 1px solid var(--border);
+  padding: 28px 24px 24px;
+}
+.hero-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.hero h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+.hero h1 em { color: var(--accent); font-style: normal; }
+.hero-desc { color: var(--text2); font-size: 13px; line-height: 1.5; max-width: 400px; margin-top: 8px; }
+.hero-stats {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.hero-stat {
+  padding: 12px 20px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat .num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--accent);
+  line-height: 1;
+}
+.hero-stat .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 2px; }
 
-  /* CONTENT */
-  .content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 24px;
-  }
+/* ── TABS ── */
+.tabs-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 54px;
+  z-index: 90;
+}
+.tabs {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--muted);
+  padding: 13px 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  position: relative;
+  top: 1px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* FILTERS */
-  .filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .search-wrap {
-    position: relative;
-    flex: 1;
-    min-width: 200px;
-    max-width: 340px;
-  }
-  .search-wrap svg {
-    position: absolute;
-    left: 11px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    pointer-events: none;
-  }
-  input[type="text"] {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 14px;
-    padding: 9px 12px 9px 36px;
-    width: 100%;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="text"]::placeholder { color: var(--muted); }
-  input[type="text"]:focus { border-color: var(--accent); }
+/* ── CONTENT ── */
+.content { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
 
-  select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 14px;
-    padding: 9px 30px 9px 12px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b9975' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    transition: border-color 0.2s;
-  }
-  select:focus { border-color: var(--accent); }
-  select option { background: #0a1a0c; }
+/* ── FILTERS ── */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 300px; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+input[type="text"] {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 10px 8px 32px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+input[type="text"]:focus { border-color: var(--accent); }
+input[type="text"]::placeholder { color: var(--muted); }
 
-  .icon-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 8px 12px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-  }
-  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .icon-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(34,197,94,0.1); }
+select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 28px 8px 10px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  font-family: 'Inter', sans-serif;
+}
+select:focus { border-color: var(--accent); outline: none; }
+select option { background: white; }
 
-  .filter-count {
-    color: var(--muted);
-    font-size: 13px;
-    margin-left: auto;
-    white-space: nowrap;
-  }
-  .filter-count b { color: var(--text); }
+.filter-count { color: var(--muted); font-size: 12px; margin-left: auto; }
+.filter-count b { color: var(--text); }
 
-  /* TABLE */
-  .table-wrap {
-    background: var(--surface);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
-    background: rgba(34,197,94,0.06);
-    padding: 10px 14px;
-    text-align: left;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    border-bottom: 1px solid var(--border);
-    transition: color 0.15s;
-  }
-  thead th:hover { color: var(--text); }
-  thead th.sorted { color: var(--accent); }
-  thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
-  thead th.sorted .sort-arrow { opacity: 1; }
+/* ── SORT CHIPS ── */
+.sort-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.sort-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 2px; }
+.sort-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 12px;
+  transition: all 0.12s;
+  font-family: 'Inter', sans-serif;
+}
+.sort-chip:hover { border-color: var(--accent); color: var(--accent); }
+.sort-chip.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
+.sel-sort-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 12px;
+  transition: all 0.12s;
+  font-family: 'Inter', sans-serif;
+}
+.sel-sort-chip:hover { border-color: var(--accent); color: var(--accent); }
+.sel-sort-chip.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
 
-  tbody tr { border-bottom: 1px solid rgba(34,197,94,0.07); transition: background 0.1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(34,197,94,0.05); }
-  td { padding: 10px 14px; vertical-align: middle; }
+/* ── TABLE STYLE ── shared base ── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  background: var(--bg2);
+  padding: 9px 14px;
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.12s;
+  font-family: 'Inter', sans-serif;
+}
+thead th:hover { color: var(--text); }
+thead th.sorted { color: var(--accent); }
+thead th .sa { margin-left: 3px; opacity: 0.4; }
+thead th.sorted .sa { opacity: 1; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--accent-light); }
+td { padding: 10px 14px; vertical-align: middle; }
 
-  .rank-num { color: var(--muted); font-size: 13px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; min-width: 36px; }
-  .rank-num.top3 { color: var(--accent); }
+.rank-num { color: var(--muted); font-size: 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; }
+.rank-num.top3 { color: var(--accent); font-size: 14px; }
 
-  .club-name { font-weight: 600; font-size: 15px; }
-  .club-abbr {
-    font-size: 12px;
-    color: var(--accent);
-    margin-top: 1px;
-    font-family: 'Barlow Condensed', sans-serif;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
+/* STR BAR */
+.str-wrap { display: flex; align-items: center; gap: 8px; min-width: 90px; }
+.str-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; min-width: 26px; text-align: right; }
+.str-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; min-width: 40px; }
+.str-fill { height: 100%; border-radius: 2px; }
 
-  .country-cell { display: flex; align-items: center; gap: 8px; }
-  .flag { font-size: 18px; line-height: 1; flex-shrink: 0; }
-  .country-name { color: var(--muted); font-size: 13px; }
+.nat-badge {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  min-width: 34px;
+  text-align: center;
+}
 
-  .liga-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.3px; }
-  .liga-level { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.club-abbr-cell {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+.club-name-cell { font-weight: 500; font-size: 14px; }
+.country-cell { display: flex; align-items: center; gap: 7px; }
+.flag { font-size: 17px; line-height: 1; }
+.country-name { color: var(--text2); font-size: 13px; }
+.liga-link { color: var(--accent); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.liga-link:hover { color: var(--accent-mid); }
+.liga-level-txt { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
-  .str-bar-wrap { display: flex; align-items: center; gap: 10px; min-width: 110px; }
-  .str-value { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; min-width: 28px; text-align: right; }
-  .str-bar { flex: 1; height: 5px; background: rgba(34,197,94,0.1); border-radius: 3px; overflow: hidden; min-width: 50px; }
-  .str-fill { height: 100%; border-radius: 3px; }
+/* ── STYLE B: Lista ── */
+#style-b tbody td { padding: 13px 14px; font-size: 14px; }
+#style-b .club-name-cell { font-size: 15px; font-weight: 600; }
 
-  .nat-str {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    text-align: center;
-    padding: 3px 8px;
-    border-radius: 5px;
-    display: inline-block;
-    min-width: 36px;
-  }
+/* ── STYLE C: Cartas (estilo selecciones) ── */
+.cartas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.club-carta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.club-carta:hover { border-color: var(--accent); background: var(--accent-light); }
+.carta-rank { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: var(--muted); min-width: 24px; text-align: right; }
+.carta-flag { font-size: 22px; }
+.carta-info { flex: 1; min-width: 0; }
+.carta-info .carta-name { font-weight: 700; font-size: 13px; line-height: 1.2; color: var(--accent); font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; }
+.carta-info .carta-fullname { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.carta-info .carta-sub { font-size: 11px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.carta-str { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; flex-shrink: 0; }
 
-  /* PAGINATION */
-  .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 16px; flex-wrap: wrap; }
-  .page-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 6px 12px;
-    transition: all 0.15s;
-    font-family: 'Inter', sans-serif;
-  }
-  .page-btn:hover { border-color: var(--accent); color: var(--text); }
-  .page-btn.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
-  .page-btn:disabled { opacity: 0.3; cursor: default; }
+/* ── SHUFFLE TAB ── */
+.shuffle-wrap { max-width: 600px; margin: 0 auto; padding-top: 10px; }
+.shuffle-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px 28px 24px; }
+.shuffle-section h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 4px; }
+.shuffle-section p { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+.shuffle-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  padding: 12px 28px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  display: block;
+  width: 100%;
+}
+.shuffle-btn:hover { background: var(--accent-mid); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.shuffle-btn:active { transform: translateY(0); }
+.shuffle-result {
+  margin-top: 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.shuffle-result.visible { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.shuffle-result .sr-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; margin-bottom: 6px; }
+.shuffle-result .sr-meta { font-size: 13px; color: var(--text2); line-height: 1.8; }
+.shuffle-result .sr-str { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px; line-height: 1; margin-top: 10px; }
+.shuffle-result .sr-str-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.shuffle-divider { border: none; border-top: 2px dashed var(--border); margin: 20px 0; }
+.shuffle-footer-text { text-align: center; color: var(--muted); font-size: 13px; line-height: 1.7; margin-top: 24px; font-style: italic; padding: 0 12px; }
 
-  /* LIGA ROWS */
-  .liga-grid { display: grid; gap: 8px; }
-  .liga-row {
-    background: var(--surface);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    display: grid;
-    grid-template-columns: 40px 1fr 90px 90px;
-    gap: 10px;
-    align-items: center;
-    transition: border-color 0.2s, background 0.2s;
-    cursor: pointer;
-  }
-  .liga-row:hover { border-color: var(--accent); background: rgba(34,197,94,0.06); }
-  .liga-rank { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; color: var(--muted); }
-  .liga-rank.top { color: var(--accent); }
-  .liga-info .name { font-weight: 600; font-size: 15px; }
-  .liga-info .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
-  .liga-info .level-badge {
-    display: inline-block;
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 3px;
-    margin-left: 6px;
-    font-weight: 700;
-    vertical-align: middle;
-    font-family: 'Barlow Condensed', sans-serif;
-    letter-spacing: 0.5px;
-  }
-  .stat-col { text-align: center; }
-  .stat-col .val { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; }
-  .stat-col .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+/* ── STYLE SWITCHER ── */
+.style-switcher {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.style-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 2px; }
+.style-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  transition: all 0.12s;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.style-btn:hover { border-color: var(--accent); color: var(--accent); }
+.style-btn.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
-  /* LIGAS SORT BAR */
-  .sort-bar {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .sort-label { font-size: 12px; color: var(--muted); }
-  .sort-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 12px;
-    padding: 4px 12px;
-    transition: all 0.15s;
-    font-family: 'Inter', sans-serif;
-  }
-  .sort-chip:hover { border-color: var(--accent); color: var(--text); }
-  .sort-chip.active { background: rgba(34,197,94,0.15); border-color: var(--accent); color: var(--accent); }
+/* ── LIGAS ── */
+.liga-grid { display: grid; gap: 6px; }
+.liga-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 42px 1fr 70px 70px;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.liga-row:hover { border-color: var(--accent); background: var(--accent-light); }
+.liga-rank { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: var(--muted); text-align: right; }
+.liga-rank.top { color: var(--accent); }
+.liga-info .name { font-weight: 600; font-size: 14px; }
+.liga-info .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.liga-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-left: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+.stat-mini { text-align: center; }
+.stat-mini .v { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; }
+.stat-mini .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; }
 
-  /* SELECCIONES */
-  .sel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
-  .sel-card {
-    background: var(--surface);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: border-color 0.2s, transform 0.1s;
-    cursor: pointer;
-  }
-  .sel-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .sel-rank { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: var(--muted); min-width: 24px; text-align: right; }
-  .sel-flag { font-size: 26px; }
-  .sel-info { flex: 1; min-width: 0; }
-  .sel-info .country { font-weight: 600; font-size: 13px; line-height: 1.2; }
-  .sel-info .continent { font-size: 11px; color: var(--muted); }
-  .sel-str { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; }
+/* ── SELECCIONES ── */
+.sel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; }
+.sel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.sel-card:hover { border-color: var(--accent); background: var(--accent-light); }
+.sel-rank { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: var(--muted); min-width: 22px; text-align: right; }
+.sel-flag { font-size: 24px; }
+.sel-info { flex: 1; min-width: 0; }
+.sel-info .country { font-weight: 600; font-size: 13px; line-height: 1.2; }
+.sel-info .continent { font-size: 11px; color: var(--muted); }
+.sel-str-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px; line-height: 1; }
 
-  /* DETAIL PANEL */
-  .detail-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  .detail-panel {
-    background: #0a1a0c;
-    border: 1px solid var(--accent);
-    border-radius: 14px;
-    width: 100%;
-    max-width: 860px;
-    margin: auto;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(34,197,94,0.1);
-  }
-  .detail-header {
-    background: rgba(34,197,94,0.08);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
-  .detail-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; }
-  .detail-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
-  .detail-close {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 20px;
-    padding: 6px 12px;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-  .detail-close:hover { border-color: var(--accent); color: var(--accent); }
-  .detail-body { padding: 20px 24px; }
-  .detail-table-wrap {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .detail-table-wrap table tbody tr:hover { background: rgba(34,197,94,0.06); }
-  .detail-stats {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .detail-stat {
-    background: rgba(34,197,94,0.06);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 16px;
-    text-align: center;
-    flex: 1;
-    min-width: 90px;
-  }
-  .detail-stat .val { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; }
-  .detail-stat .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; margin-top: 2px; }
+/* ── PAGINATION ── */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 14px; flex-wrap: wrap; }
+.page-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 11px;
+  transition: all 0.12s;
+  font-family: 'Inter', sans-serif;
+}
+.page-btn:hover { border-color: var(--accent); color: var(--accent); }
+.page-btn.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+.page-btn:disabled { opacity: 0.3; cursor: default; }
 
-  /* INFO TAB */
-  .info-content { max-width: 780px; }
-  .info-section { margin-bottom: 36px; }
-  .info-section h2 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-    color: var(--accent);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .info-section p { color: #a7c4ab; line-height: 1.7; margin-bottom: 10px; font-size: 14px; }
-  .info-section ul { color: #a7c4ab; line-height: 1.8; font-size: 14px; padding-left: 20px; }
-  .info-section li { margin-bottom: 4px; }
-  .info-callout {
-    background: rgba(234,179,8,0.08);
-    border: 1px solid rgba(234,179,8,0.25);
-    border-radius: 8px;
-    padding: 14px 18px;
-    color: #d4b53a;
-    font-size: 13px;
-    line-height: 1.6;
-    margin-top: 10px;
-  }
-  .info-callout strong { color: #eab308; }
-  .strength-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-top: 12px; }
-  .legend-item {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-  .legend-text .range { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; }
-  .legend-text .desc { font-size: 11px; color: var(--muted); }
+/* ── DETAIL OVERLAY ── */
+.detail-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+.detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  width: 100%; max-width: 820px;
+  margin: auto;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.detail-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.detail-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; text-transform: uppercase; }
+.detail-sub { color: var(--text2); font-size: 13px; margin-top: 2px; }
+.detail-close {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 10px;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.detail-close:hover { border-color: var(--red); color: var(--red); }
+.detail-body { padding: 18px 22px; }
+.detail-stats { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.detail-stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 16px;
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+.detail-stat .val { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; }
+.detail-stat .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; margin-top: 2px; }
+.detail-table-wrap { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.detail-table-wrap table tbody tr:hover { background: var(--accent-light); }
 
-  /* EMPTY */
-  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+/* ── INFO ── */
+.info-content { max-width: 720px; }
+.info-section { margin-bottom: 36px; }
+.info-section h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+}
+.info-section h2 .ico { color: var(--accent); }
+.info-section p { color: var(--text2); line-height: 1.7; margin-bottom: 10px; font-size: 14px; }
+.info-section ul { color: var(--text2); line-height: 1.8; font-size: 14px; padding-left: 20px; }
+.info-section li { margin-bottom: 4px; }
+.info-callout {
+  background: #fff8e1;
+  border-left: 3px solid var(--yellow);
+  border-radius: 0 4px 4px 0;
+  padding: 12px 16px;
+  color: #5a4500;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+.strength-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin-top: 12px; }
+.legend-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 28px 24px;
-    color: var(--muted);
-    font-size: 13px;
-    border-top: 1px solid var(--border);
-    margin-top: 40px;
-    background: rgba(2,8,3,0.6);
-  }
+/* ── STRENGTH FILTER CHIPS ── */
+.sw-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+.str-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 11px;
+  transition: all 0.12s;
+  font-family: 'Inter', sans-serif;
+}
+.str-chip:hover { border-color: var(--border-strong); }
+.str-chip .str-chip-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.str-chip.active {
+  border-color: var(--c);
+  color: var(--text);
+  background: var(--cbg);
+  font-weight: 600;
+}
+.legend-text .range { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; }
+.legend-text .desc { font-size: 11px; color: var(--muted); }
 
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .liga-row { grid-template-columns: 32px 1fr 70px; }
-    .liga-row .stat-col:nth-child(4) { display: none; }
-    td.hide-mobile { display: none; }
-    .sel-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-    .detail-overlay { padding: 10px; }
-  }
+/* ── FEEDBACK FORM ── */
+.fb-form { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.fb-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.fb-row > * { flex: 1 1 180px; }
+.fb-form label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+.fb-form input, .fb-form select, .fb-form textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 9px 11px;
+  transition: border-color 0.12s;
+}
+.fb-form input:focus, .fb-form select:focus, .fb-form textarea:focus { outline: none; border-color: var(--accent); }
+.fb-form textarea { resize: vertical; min-height: 110px; }
+.fb-submit {
+  align-self: flex-start;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  transition: opacity 0.12s;
+}
+.fb-submit:hover { opacity: 0.88; }
+.fb-submit:disabled { opacity: 0.5; cursor: default; }
+.fb-status { font-size: 13px; margin-top: 4px; min-height: 18px; }
+.fb-status.ok { color: var(--accent); }
+.fb-status.err { color: var(--red); }
+
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+  background: var(--surface);
+}
+
+@media (max-width: 768px) {
+  .liga-row { grid-template-columns: 36px 1fr 60px; }
+  .liga-row .stat-mini:last-child { display: none; }
+  td.hide-mob { display: none; }
+  .club-card { grid-template-columns: 30px 64px 1fr auto; }
+  .club-card .card-bar-col { display: none; }
+  .hero-stats { width: 100%; }
+}
 </style>
 </head>
 <body>
 
-<!-- PITCH BACKGROUND -->
-<div class="pitch-bg">
-  <div class="light-left"></div>
-  <div class="light-right"></div>
-  <svg class="pitch-svg" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
-    <!-- Pitch outline -->
-    <rect x="50" y="30" width="1100" height="540" fill="none" stroke="#22c55e" stroke-width="2.5"/>
-    <!-- Center line -->
-    <line x1="600" y1="30" x2="600" y2="570" stroke="#22c55e" stroke-width="2"/>
-    <!-- Center circle -->
-    <circle cx="600" cy="300" r="80" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <circle cx="600" cy="300" r="3" fill="#22c55e"/>
-    <!-- Left penalty area -->
-    <rect x="50" y="170" width="150" height="260" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <!-- Left goal area -->
-    <rect x="50" y="230" width="55" height="140" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <!-- Right penalty area -->
-    <rect x="1000" y="170" width="150" height="260" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <!-- Right goal area -->
-    <rect x="1095" y="230" width="55" height="140" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <!-- Corner arcs -->
-    <path d="M50 50 Q65 30 80 30" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <path d="M1120 50 Q1135 30 1150 30" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <path d="M50 550 Q65 570 80 570" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <path d="M1120 550 Q1135 570 1150 570" fill="none" stroke="#22c55e" stroke-width="2"/>
-    <!-- Stripes (alternating bands) -->
-    <rect x="50" y="30" width="100" height="540" fill="#22c55e" opacity="0.15"/>
-    <rect x="250" y="30" width="100" height="540" fill="#22c55e" opacity="0.15"/>
-    <rect x="450" y="30" width="100" height="540" fill="#22c55e" opacity="0.15"/>
-    <rect x="650" y="30" width="100" height="540" fill="#22c55e" opacity="0.15"/>
-    <rect x="850" y="30" width="100" height="540" fill="#22c55e" opacity="0.15"/>
-    <rect x="1050" y="30" width="100" height="540" fill="#22c55e" opacity="0.15"/>
-    <!-- Penalty spots -->
-    <circle cx="161" cy="300" r="3" fill="#22c55e"/>
-    <circle cx="1039" cy="300" r="3" fill="#22c55e"/>
-  </svg>
-</div>
-
 <header>
   <div class="header-inner">
-    <div class="logo"><span class="logo-ball">⚽</span> NSS<span>Finder</span></div>
-    <div class="header-badge">New Star Soccer · Datos v2025b · <b>Fuerza de Clubes</b></div>
+    <div class="logo">NSS<span>Finder</span></div>
+    <div class="header-badge">New Star Soccer · Datos v2025b</div>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema" aria-label="Cambiar tema claro/oscuro"></button>
   </div>
 </header>
 
 <div class="hero">
-  <h1>NSS <span class="highlight">Finder</span></h1>
-  <p>Los valores internos que el juego no te muestra. Compará clubes, ligas y selecciones de todo el mundo.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="num">3.766</div><div class="lbl">Clubes</div></div>
-    <div class="hero-stat"><div class="num">275</div><div class="lbl">Ligas</div></div>
-    <div class="hero-stat"><div class="num">116</div><div class="lbl">Países</div></div>
-    <div class="hero-stat"><div class="num">211</div><div class="lbl">Selecciones</div></div>
+  <div class="hero-inner">
+    <div>
+      <h1>NSS <em>Finder</em></h1>
+      <p class="hero-desc">Estadísticas de New Star Soccer.<br>Los valores internos que el juego no te muestra. Compará equipos, ligas y selecciones.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">3.766</div><div class="lbl">Clubes</div></div>
+      <div class="hero-stat"><div class="num">275</div><div class="lbl">Ligas</div></div>
+      <div class="hero-stat"><div class="num">116</div><div class="lbl">Países</div></div>
+      <div class="hero-stat"><div class="num">211</div><div class="lbl">Selecciones</div></div>
+    </div>
   </div>
 </div>
 
 <div class="tabs-bar">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('clubs')">⚽ Clubes</button>
-    <button class="tab-btn" onclick="showTab('ligas')">🏆 Ligas</button>
-    <button class="tab-btn" onclick="showTab('sels')">🌍 Selecciones</button>
-    <button class="tab-btn" onclick="showTab('info')">ℹ️ Info</button>
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" onclick="showTab('clubs')">⚽ Clubes</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('ligas')">🏆 Ligas</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('sels')">🌍 Selecciones</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('shuffle')">🎲 Shuffle</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="showTab('info')">ℹ️ Info</button>
   </div>
 </div>
 
-<!-- ═══ CLUBS TAB ═══ -->
+<!-- ══ CLUBS ══ -->
 <div id="tab-clubs" class="content">
   <div class="filters">
     <div class="search-wrap">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="club-search" placeholder="Buscar club..." oninput="filterClubs()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="club-search" placeholder="Buscar club o sigla..." oninput="filterClubs()">
     </div>
-    <select id="club-country" onchange="filterClubs()">
-      <option value="">Todos los países</option>
-    </select>
+    <select id="club-country" onchange="filterClubs()"><option value="">Todos los países</option></select>
     <select id="club-level" onchange="filterClubs()">
       <option value="">Todos los niveles</option>
       <option value="1ª división">1ª División</option>
@@ -701,30 +753,47 @@
     </select>
     <div class="filter-count" id="club-count"></div>
   </div>
-  <div class="table-wrap">
-    <table id="clubs-table">
-      <thead>
-        <tr>
-          <th onclick="sortClubs('rank')">#<span class="sort-arrow">↕</span></th>
-          <th onclick="sortClubs('abbr')">Sigla<span class="sort-arrow">↕</span></th>
-          <th onclick="sortClubs('name')">Nombre<span class="sort-arrow">↕</span></th>
-          <th onclick="sortClubs('country')">País<span class="sort-arrow">↕</span></th>
-          <th onclick="sortClubs('liga')">Liga<span class="sort-arrow">↕</span></th>
-          <th onclick="sortClubs('str')" class="sorted">Fuerza<span class="sort-arrow">↓</span></th>
-          <th class="hide-mobile" onclick="sortClubs('natStr')">Selección<span class="sort-arrow">↕</span></th>
-        </tr>
-      </thead>
-      <tbody id="clubs-tbody"></tbody>
+
+  <div class="style-switcher">
+    <span class="style-label">Vista:</span>
+    <button class="style-btn active" onclick="setStyle('b', this)">☰ Lista</button>
+    <button class="style-btn" onclick="setStyle('c', this)">⊞ Cartas</button>
+    <span class="sw-sep"></span>
+    <span class="style-label">Fuerza:</span>
+    <button class="str-chip" aria-pressed="false" style="--c:#d4af37;--cbg:rgba(212,175,55,0.15)" onclick="toggleClubStr('elite',this)"><span class="str-chip-dot" style="background:#d4af37"></span>Elite mundial</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#2d9e52;--cbg:rgba(45,158,82,0.15)" onclick="toggleClubStr('muy',this)"><span class="str-chip-dot" style="background:#2d9e52"></span>Muy fuerte</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c07a00;--cbg:rgba(192,122,0,0.15)" onclick="toggleClubStr('comp',this)"><span class="str-chip-dot" style="background:#c07a00"></span>Competitivo</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#b85c00;--cbg:rgba(184,92,0,0.15)" onclick="toggleClubStr('medio',this)"><span class="str-chip-dot" style="background:#b85c00"></span>Medio</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c0392b;--cbg:rgba(192,57,43,0.15)" onclick="toggleClubStr('debil',this)"><span class="str-chip-dot" style="background:#c0392b"></span>Débil</button>
+  </div>
+
+  <!-- TABLE B: Lista -->
+  <div class="table-wrap" id="wrap-b">
+    <table id="style-b">
+      <thead><tr>
+        <th onclick="sortClubs('rank')">#<span class="sa">↕</span></th>
+        <th onclick="sortClubs('abbr')">Sigla<span class="sa">↕</span></th>
+        <th onclick="sortClubs('name')">Nombre<span class="sa">↕</span></th>
+        <th onclick="sortClubs('country')">País<span class="sa">↕</span></th>
+        <th onclick="sortClubs('liga')">Liga<span class="sa">↕</span></th>
+        <th onclick="sortClubs('str')" class="sorted">Fuerza<span class="sa">↓</span></th>
+        <th class="hide-mob" onclick="sortClubs('natStr')">Selección<span class="sa">↕</span></th>
+      </tr></thead>
+      <tbody id="tbody-b"></tbody>
     </table>
   </div>
+
+  <!-- CARTAS C -->
+  <div class="cartas-grid" id="wrap-c" style="display:none"></div>
+
   <div class="pagination" id="clubs-pagination"></div>
 </div>
 
-<!-- ═══ LIGAS TAB ═══ -->
+<!-- ══ LIGAS ══ -->
 <div id="tab-ligas" class="content" style="display:none">
   <div class="filters">
     <div class="search-wrap">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="liga-search" placeholder="Buscar liga o país..." oninput="filterLigas()">
     </div>
     <select id="liga-level" onchange="filterLigas()">
@@ -736,24 +805,25 @@
     </select>
     <div class="filter-count" id="liga-count"></div>
   </div>
-  <div class="sort-bar" style="margin-bottom:12px">
-    <span class="sort-label">🔽 Ordenar por:</span>
-    <button class="sort-chip active" onclick="sortLigas('rank', this)">Ranking</button>
-    <button class="sort-chip" onclick="sortLigas('avg_desc', this)">Mayor promedio</button>
-    <button class="sort-chip" onclick="sortLigas('avg_asc', this)">Menor promedio</button>
-    <button class="sort-chip" onclick="sortLigas('max_desc', this)">Mayor fuerza</button>
-    <button class="sort-chip" onclick="sortLigas('country', this)">País A→Z</button>
-    <button class="sort-chip" onclick="sortLigas('clubs', this)">Nº clubes</button>
+  <div class="sort-bar">
+    <span class="sort-label">Ordenar:</span>
+    <button class="sort-chip active" onclick="sortLigas('rank',this)">Ranking</button>
+    <button class="sort-chip" onclick="sortLigas('avg_desc',this)">Mayor promedio</button>
+    <button class="sort-chip" onclick="sortLigas('avg_asc',this)">Menor promedio</button>
+    <button class="sort-chip" onclick="sortLigas('max_desc',this)">Mayor fuerza</button>
+    <button class="sort-chip" onclick="sortLigas('country',this)">País A→Z</button>
+    <button class="sort-chip" onclick="sortLigas('clubs',this)">Nº clubes</button>
+    <button class="sort-chip" onclick="sortLigas('shuffle',this)">🎲 Aleatorio</button>
   </div>
   <div class="liga-grid" id="ligas-grid"></div>
   <div class="pagination" id="ligas-pagination"></div>
 </div>
 
-<!-- ═══ SELECCIONES TAB ═══ -->
+<!-- ══ SELECCIONES ══ -->
 <div id="tab-sels" class="content" style="display:none">
   <div class="filters">
     <div class="search-wrap">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="sel-search" placeholder="Buscar país..." oninput="filterSels()">
     </div>
     <select id="sel-continent" onchange="filterSels()">
@@ -767,77 +837,136 @@
     </select>
     <div class="filter-count" id="sel-count"></div>
   </div>
-  <div class="sort-bar" style="margin-bottom:12px">
-    <span class="sort-label">🔽 Ordenar por:</span>
-    <button class="sel-sort-chip active" onclick="sortSels('rank', this)">Ranking</button>
-    <button class="sel-sort-chip" onclick="sortSels('str_desc', this)">Mayor fuerza ↓</button>
-    <button class="sel-sort-chip" onclick="sortSels('str_asc', this)">Menor fuerza ↑</button>
-    <button class="sel-sort-chip" onclick="sortSels('country', this)">País A→Z</button>
+  <div class="sort-bar">
+    <span class="sort-label">Ordenar:</span>
+    <button class="sel-sort-chip active" onclick="sortSels('str_desc',this)">Mayor fuerza ↓</button>
+    <button class="sel-sort-chip" onclick="sortSels('str_asc',this)">Menor fuerza ↑</button>
+    <button class="sel-sort-chip" onclick="sortSels('country',this)">País A→Z</button>
+    <button class="sel-sort-chip" onclick="sortSels('shuffle',this)">🎲 Aleatorio</button>
+    <span class="sw-sep"></span>
+    <span class="sort-label">Fuerza:</span>
+    <button class="str-chip" aria-pressed="false" style="--c:#d4af37;--cbg:rgba(212,175,55,0.15)" onclick="toggleSelStr('elite',this)"><span class="str-chip-dot" style="background:#d4af37"></span>Elite mundial</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#2d9e52;--cbg:rgba(45,158,82,0.15)" onclick="toggleSelStr('muy',this)"><span class="str-chip-dot" style="background:#2d9e52"></span>Muy fuerte</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c07a00;--cbg:rgba(192,122,0,0.15)" onclick="toggleSelStr('comp',this)"><span class="str-chip-dot" style="background:#c07a00"></span>Competitivo</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#b85c00;--cbg:rgba(184,92,0,0.15)" onclick="toggleSelStr('medio',this)"><span class="str-chip-dot" style="background:#b85c00"></span>Medio</button>
+    <button class="str-chip" aria-pressed="false" style="--c:#c0392b;--cbg:rgba(192,57,43,0.15)" onclick="toggleSelStr('debil',this)"><span class="str-chip-dot" style="background:#c0392b"></span>Débil</button>
   </div>
   <div class="sel-grid" id="sels-grid"></div>
 </div>
 
-<!-- ═══ INFO TAB ═══ -->
+<!-- ══ SHUFFLE ══ -->
+<div id="tab-shuffle" class="content" style="display:none">
+  <div class="shuffle-wrap">
+
+    <div class="shuffle-section">
+      <h2>⚽ Club Aleatorio</h2>
+      <p>Presioná el botón para recibir un club al azar de cualquier parte del mundo.</p>
+      <button class="shuffle-btn" onclick="doShuffleClub()">🎲 Dame un Club</button>
+      <div class="shuffle-result" id="shuffle-club-result"></div>
+    </div>
+
+    <hr class="shuffle-divider">
+
+    <div class="shuffle-section">
+      <h2>🌍 Selección Aleatoria</h2>
+      <p>Presioná el botón para recibir una selección nacional al azar.</p>
+      <button class="shuffle-btn" onclick="doShuffleSel()">🌍 Dame una Selección</button>
+      <div class="shuffle-result" id="shuffle-sel-result"></div>
+    </div>
+
+    <p class="shuffle-footer-text">Esta sección está diseñada para darte un club/selección aleatorio/a y que al crear una carrera o cambiar de club, dejes la decisión… al azar…</p>
+
+  </div>
+</div>
+
+<!-- ══ INFO ══ -->
 <div id="tab-info" class="content" style="display:none">
   <div class="info-content">
-
     <div class="info-section">
-      <h2>⚽ ¿Qué es NSS Finder?</h2>
-      <p>NSS Finder es una wiki no oficial creada por un fan de New Star Soccer para ayudar a otros jugadores a comparar equipos, ligas y selecciones usando los valores internos que el juego usa para calcular la dificultad.</p>
-      <p>La pregunta que motivó este proyecto: <em>"¿Un club de la 2ª de Austria es más fuerte o más débil que Boca Juniors?"</em> — ahora podés saberlo.</p>
+      <h2><span class="ico">⚽</span> ¿Qué es NSS Finder?</h2>
+      <p>NSS Finder es una wiki no oficial creada por un fan argentino de New Star Soccer, para ayudar a otros jugadores a comparar equipos, ligas y selecciones usando los valores internos que el juego usa para simular los partidos, pero que nunca muestra directamente.</p>
+      <p>Lo que motivó este proyecto fue la falta de una fuente en internet que dé el dato objetivo: <em>"¿Qué club es más fuerte?"</em> — ahora podés saberlo.</p>
     </div>
 
     <div class="info-section">
-      <h2>🗂️ Origen de los datos</h2>
-      <p>Los datos provienen de los archivos internos del juego New Star Soccer para Android (APK versión 4.32, datos v2025b). El juego incluye estos archivos en su instalación para generar los partidos de manera predecible.</p>
+      <h2><span class="ico">🗂️</span> Origen de los datos</h2>
+      <p>Los datos provienen de los archivos internos del juego (APK Android, versión 4.32, datos v2025b). El juego incluye estos archivos para generar los partidos:</p>
       <ul>
         <li><strong>Clubs.txt</strong> — lista de todos los clubes con su valor de fuerza</li>
-        <li><strong>Nations.txt</strong> — lista de selecciones nacionales con su fuerza</li>
-        <li><strong>Competitions.txt</strong> — estructura de ligas y competiciones por país</li>
+        <li><strong>Nations.txt</strong> — selecciones nacionales con su fuerza</li>
+        <li><strong>Competitions.txt</strong> — estructura de ligas por país</li>
       </ul>
-      <p>Estos archivos son los mismos que se pueden ver y editar con el editor oculto de la versión de PC (NSS5 en Steam, accesible con Ctrl+E en el menú principal).</p>
+      <p style="margin-top:10px">Son los mismos valores que se pueden ver en el editor oculto de la versión PC (NSS5 en Steam, accesible con Ctrl+E).</p>
     </div>
 
     <div class="info-section">
-      <h2>💪 ¿Qué significa "Fuerza"?</h2>
-      <p>La <strong>Fuerza</strong> (Strength en inglés) es el valor numérico que el juego asigna internamente a cada club y a cada selección nacional. Va de 0 a 99 aproximadamente, y determina qué tan competitivo es el equipo.</p>
-      <p>No es el único factor (la calidad de tu propio jugador influye mucho), pero es el principal indicador de la dificultad de un club.</p>
+      <h2><span class="ico">💪</span> ¿Qué significa "Fuerza"?</h2>
+      <p>La <strong>Fuerza</strong> es el número interno (0–99) que el juego asigna a cada equipo para determinar su nivel en los partidos simulados: cuánto anota, qué tan difícil es ganarle, dónde termina en la tabla.</p>
       <div class="strength-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div><div class="legend-text"><div class="range" style="color:#00d4ff">90–99</div><div class="desc">Elite mundial</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div><div class="legend-text"><div class="range" style="color:#22c55e">80–89</div><div class="desc">Muy fuerte</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div><div class="legend-text"><div class="range" style="color:#eab308">70–79</div><div class="desc">Competitivo</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div><div class="legend-text"><div class="range" style="color:#f97316">55–69</div><div class="desc">Medio</div></div></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div><div class="legend-text"><div class="range" style="color:#ef4444">0–54</div><div class="desc">Débil</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#d4af37"></div><div class="legend-text"><div class="range" style="color:#d4af37">95–99</div><div class="desc">Elite mundial</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2d9e52"></div><div class="legend-text"><div class="range" style="color:#2d9e52">80–94</div><div class="desc">Muy fuerte</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c07a00"></div><div class="legend-text"><div class="range" style="color:#c07a00">70–79</div><div class="desc">Competitivo</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#b85c00"></div><div class="legend-text"><div class="range" style="color:#b85c00">55–69</div><div class="desc">Medio</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div><div class="legend-text"><div class="range" style="color:#c0392b">0–54</div><div class="desc">Débil</div></div></div>
       </div>
     </div>
 
     <div class="info-section">
-      <h2>🔄 Ascensos y descensos</h2>
-      <p>Los clubes listados en cada liga corresponden a la alineación inicial al comenzar una nueva carrera. Sin embargo, al terminar la primera temporada, algunos equipos ascenderán y otros descenderán.</p>
+      <h2><span class="ico">🌍</span> ¿Para qué sirve la columna "Selección"?</h2>
+      <p>Al inicio del juego elegís la nacionalidad de tu jugador. Esto importa porque, si tu desempeño lo justifica, podrás ser convocado y jugar mundiales con esa selección nacional — que en el juego funciona como un equipo más con su propia fuerza.</p>
+      <p>La columna "Selección" en la tabla de clubes muestra la fuerza de la selección del país de ese club. Es útil para entender el contexto: un club argentino tiene detrás una selección con 86 de fuerza, lo que dice bastante del nivel futbolístico del país.</p>
+    </div>
+
+    <div class="info-section">
+      <h2><span class="ico">🔄</span> Ascensos y descensos</h2>
+      <p>Los clubes listados en cada liga corresponden al inicio de una nueva carrera. Al terminar la primera temporada, habrá ascensos y descensos.</p>
       <div class="info-callout">
-        ⚠️ <strong>Importante:</strong> No se conoce con certeza el patrón exacto que sigue el juego para determinar los ascensos y descensos entre temporadas. Es posible que la fuerza influya, pero hay otros factores en juego.
+        ⚠️ No se conoce con certeza el patrón exacto que sigue el juego para determinar los ascensos y descensos entre temporadas. Esta wiki refleja únicamente la configuración inicial.
       </div>
     </div>
 
     <div class="info-section">
-      <h2>📋 Cómo usar la tabla de Clubes</h2>
+      <h2><span class="ico">📋</span> Tips de uso</h2>
       <ul>
-        <li>La columna <strong>Sigla</strong> muestra exactamente el nombre abreviado que aparece en el juego — útil para comparar la wiki con la pantalla de tu teléfono</li>
-        <li>Podés ordenar por sigla (A→Z) para encontrar rápido un equipo mientras jugás</li>
-        <li>Filtrá por país y nivel de liga para ver el panorama de una categoría específica</li>
-        <li>La columna <strong>Selección</strong> muestra la fuerza de la selección nacional del país — útil para entender el contexto del fútbol local</li>
+        <li>La columna <strong>Sigla</strong> muestra el nombre abreviado exacto que aparece en el juego — ordená por sigla (A→Z) para encontrar equipos rápido mientras jugás</li>
+        <li>Hacé click en cualquier <strong>liga</strong> (en la tabla de clubes o en la pestaña Ligas) para ver todos sus equipos</li>
+        <li>Hacé click en una <strong>selección</strong> para ver sus ligas, y desde ahí en cada liga para ver sus clubes</li>
+        <li>En la pestaña de clubes podés elegir entre 2 vistas: Lista o Cartas</li>
+        <li>En Clubes y Selecciones podés filtrar por <strong>Fuerza</strong> (Elite mundial, Muy fuerte, etc.) — se pueden combinar varias categorías</li>
       </ul>
     </div>
 
     <div class="info-section">
-      <h2>⚠️ Limitaciones</h2>
-      <ul>
-        <li>Esta es información no oficial, creada por fans para fans</li>
-        <li>Los datos corresponden a la versión 4.32 del juego (datos 2025b) — versiones futuras pueden cambiar los valores</li>
-        <li>~2.370 clubes adicionales existen en los archivos del juego pero no tienen liga asignada; no se incluyen aquí</li>
-      </ul>
+      <h2><span class="ico">💬</span> Mensajes, ideas y recomendaciones</h2>
+      <p>¿Encontraste un error en los datos? ¿Tenés una idea para mejorar la wiki o algo que te gustaría ver? Dejame tu mensaje acá abajo. Toda sugerencia suma.</p>
+      <form class="fb-form" id="fb-form" onsubmit="submitFeedback(event)">
+        <div class="fb-row">
+          <div>
+            <label for="fb-name">Nombre (opcional)</label>
+            <input type="text" id="fb-name" name="name" placeholder="Cómo te llamás">
+          </div>
+          <div>
+            <label for="fb-type">Tipo de mensaje</label>
+            <select id="fb-type" name="type">
+              <option value="Recomendación">Recomendación</option>
+              <option value="Idea para implementar">Idea para implementar</option>
+              <option value="Reporte de error en datos">Reporte de error en datos</option>
+              <option value="Mensaje general">Mensaje general</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="fb-email">Email (opcional, si querés respuesta)</label>
+          <input type="email" id="fb-email" name="email" placeholder="tu@email.com">
+        </div>
+        <div>
+          <label for="fb-msg">Tu mensaje</label>
+          <textarea id="fb-msg" name="message" placeholder="Escribí acá tu mensaje, idea o recomendación..." required></textarea>
+        </div>
+        <button type="submit" class="fb-submit" id="fb-submit">Enviar mensaje</button>
+        <div class="fb-status" id="fb-status"></div>
+      </form>
     </div>
-
   </div>
 </div>
 
@@ -854,276 +983,445 @@
     <div class="detail-body">
       <div class="detail-stats" id="detail-stats"></div>
       <div class="detail-table-wrap">
-        <table>
-          <thead><tr id="detail-thead"></tr></thead>
-          <tbody id="detail-tbody"></tbody>
-        </table>
+        <table><thead><tr id="detail-thead"></tr></thead><tbody id="detail-tbody"></tbody></table>
       </div>
     </div>
   </div>
 </div>
 
-<footer>
-  Creado por Lucio, un fan de NSS, con ayuda de herramientas de IA 🇦🇷❤️
-</footer>
+<footer>Creado por Lucio, un fan de NSS, con Claude Code 🇦🇷❤️</footer>
 
+<script src="data.js"></script>
 <script>
-// ── DATA ────────────────────────────────────────────────────────────────
-const DATA = {"clubs":[{"rank":1,"name":"Real Madrid","abbr":"MADRID","str":99,"country":"Spain","liga":"ESP1","level":"1ª división","natStr":96},{"rank":2,"name":"Man City","abbr":"MAN C","str":98,"country":"England","liga":"ENG PR","level":"1ª división","natStr":93},{"rank":3,"name":"Liverpool","abbr":"L'POOL","str":98,"country":"England","liga":"ENG PR","level":"1ª división","natStr":93},{"rank":4,"name":"Barcelona","abbr":"BARÇA","str":97,"country":"Spain","liga":"ESP1","level":"1ª división","natStr":96},{"rank":5,"name":"Bayern","abbr":"BAYERN","str":97,"country":"Germany","liga":"GER1","level":"1ª división","natStr":95},{"rank":6,"name":"Arsenal","abbr":"ARSNL","str":97,"country":"England","liga":"ENG PR","level":"1ª división","natStr":93},{"rank":7,"name":"Bayer Leverkusen","abbr":"BAYER","str":95,"country":"Germany","liga":"GER1","level":"1ª división","natStr":95},{"rank":8,"name":"Atlético","abbr":"ATMAD","str":95,"country":"Spain","liga":"ESP1","level":"1ª división","natStr":96},{"rank":9,"name":"PSG","abbr":"PSG","str":95,"country":"France","liga":"FRA1","level":"1ª división","natStr":81},{"rank":10,"name":"Inter Milan","abbr":"INTER","str":95,"country":"Italy","liga":"ITA A","level":"1ª división","natStr":89},{"rank":11,"name":"Juventus","abbr":"TURIN J","str":93,"country":"Italy","liga":"ITA A","level":"1ª división","natStr":89},{"rank":12,"name":"Tottenham","abbr":"SPURS","str":93,"country":"England","liga":"ENG PR","level":"1ª división","natStr":93},{"rank":13,"name":"Aston Villa","abbr":"A VILLA","str":93,"country":"England","liga":"ENG PR","level":"1ª división","natStr":93},{"rank":14,"name":"Dortmund","abbr":"DORTMU","str":93,"country":"Germany","liga":"GER1","level":"1ª división","natStr":95},{"rank":15,"name":"RB Leipzig","abbr":"RB LZG","str":91,"country":"Germany","liga":"GER1","level":"1ª división","natStr":95},{"rank":16,"name":"Atalanta","abbr":"ATALAN","str":91,"country":"Italy","liga":"ITA A","level":"1ª división","natStr":89},{"rank":17,"name":"Milan","abbr":"MILAN","str":91,"country":"Italy","liga":"ITA A","level":"1ª división","natStr":89},{"rank":18,"name":"Girona","abbr":"GIRONA","str":91,"country":"Spain","liga":"ESP1","level":"1ª división","natStr":96},{"rank":19,"name":"Ajax","abbr":"AJAX","str":91,"country":"Netherlands","liga":"NED1","level":"1ª división","natStr":85},{"rank":20,"name":"Chelsea","abbr":"CHELS","str":90,"country":"England","liga":"ENG PR","level":"1ª división","natStr":93},{"rank":124,"name":"River Plate","abbr":"RIVER","str":75,"country":"Argentina","liga":"ARG1","level":"1ª división","natStr":86},{"rank":125,"name":"Boca Juniors","abbr":"BOCA","str":75,"country":"Argentina","liga":"ARG1","level":"1ª división","natStr":86}],"ligas":[{"rank":1,"country":"England","liga":"ENG PR","level":"1","clubs":20,"avg":85.2,"max":98,"min":75,"best":"Man City"},{"rank":2,"country":"Italy","liga":"ITA A","level":"1","clubs":20,"avg":84,"max":95,"min":75,"best":"Inter Milan"},{"rank":3,"country":"Spain","liga":"ESP1","level":"1","clubs":20,"avg":84,"max":99,"min":67,"best":"Real Madrid"},{"rank":4,"country":"Germany","liga":"GER1","level":"1","clubs":18,"avg":82.2,"max":97,"min":73,"best":"Bayern"}],"sels":[{"rank":1,"country":"Spain","str":96,"continent":"Europe"},{"rank":2,"country":"Germany","str":95,"continent":"Europe"},{"rank":3,"country":"England","str":93,"continent":"Europe"},{"rank":4,"country":"Uruguay","str":93,"continent":"South America"},{"rank":5,"country":"Portugal","str":90,"continent":"Europe"},{"rank":6,"country":"Italy","str":89,"continent":"Europe"},{"rank":7,"country":"Argentina","str":86,"continent":"South America"}]};
 
-// ── UTILITIES ────────────────────────────────────────────────────────────
-const FLAGS = {"Albania":"🇦🇱","Algeria":"🇩🇿","Andorra":"🇦🇩","Angola":"🇦🇴","Argentina":"🇦🇷","Armenia":"🇦🇲","Aruba":"🇦🇼","Australia":"🇦🇺","Austria":"🇦🇹","Azerbaijan":"🇦🇿","Bahrain":"🇧🇭","Belarus":"🇧🇾","Belgium":"🇧🇪","Belize":"🇧🇿","Bolivia":"🇧🇴","Bosnia":"🇧🇦","Botswana":"🇧🇼","Brazil":"🇧🇷","Bulgaria":"🇧🇬","Canada":"🇨🇦","Chile":"🇨🇱","China":"🇨🇳","Colombia":"🇨🇴","Costa Rica":"🇨🇷","Croatia":"🇭🇷","Cyprus":"🇨🇾","Czech Republic":"🇨🇿","Denmark":"🇩🇰","Dominican Republic":"🇩🇴","Ecuador":"🇪🇨","Egypt":"🇪🇬","El Salvador":"🇸🇻","Estonia":"🇪🇪","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Faroe Islands":"🇫🇴","Finland":"🇫🇮","France":"🇫🇷","Georgia":"🇬🇪","Germany":"🇩🇪","Ghana":"🇬🇭","Gibraltar":"🇬🇮","Greece":"🇬🇷","Guatemala":"🇬🇹","Haiti":"🇭🇹","Honduras":"🇭🇳","Hungary":"🇭🇺","Iceland":"🇮🇸","India":"🇮🇳","Indonesia":"🇮🇩","Iran":"🇮🇷","Iraq":"🇮🇶","Ireland":"🇮🇪","Israel":"🇮🇱","Italy":"🇮🇹","Jamaica":"🇯🇲","Japan":"🇯🇵","Kazakhstan":"🇰🇿","Kenya":"🇰🇪","Kosovo":"🇽🇰","Latvia":"🇱🇻","Lithuania":"🇱🇹","Luxembourg":"🇱🇺","Malaysia":"🇲🇾","Mali":"🇲🇱","Malta":"🇲🇹","Mexico":"🇲🇽","Moldova":"🇲🇩","Montenegro":"🇲🇪","Morocco":"🇲🇦","N. Macedonia":"🇲🇰","Namibia":"🇳🇦","Netherlands":"🇳🇱","New Zealand":"🇳🇿","Nicaragua":"🇳🇮","Nigeria":"🇳🇬","Northern Ireland":"🇬🇧","Norway":"🇳🇴","Panama":"🇵🇦","Paraguay":"🇵🇾","Peru":"🇵🇪","Philippines":"🇵🇭","Poland":"🇵🇱","Portugal":"🇵🇹","Puerto Rico":"🇵🇷","Qatar":"🇶🇦","Romania":"🇷🇴","Russia":"🇷🇺","Saudi Arabia":"🇸🇦","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Serbia":"🇷🇸","Seychelles":"🇸🇨","Singapore":"🇸🇬","Slovakia":"🇸🇰","Slovenia":"🇸🇮","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","St Kitts & Nevis":"🇰🇳","Sudan":"🇸🇩","Suriname":"🇸🇷","Sweden":"🇸🇪","Switzerland":"🇨🇭","Tanzania":"🇹🇿","Thailand":"🇹🇭","Trinidad & Tobago":"🇹🇹","Tunisia":"🇹🇳","Turkey":"🇹🇷","UAE":"🇦🇪","Uganda":"🇺🇬","Ukraine":"🇺🇦","USA":"🇺🇸","Uruguay":"🇺🇾","Uzbekistan":"🇺🇿","Venezuela":"🇻🇪","Vietnam":"🇻🇳","Wales":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","Zambia":"🇿🇲"};
-
-function flag(c) { return FLAGS[c] || "🏳️"; }
-function strColor(v) {
-  if (v>=90) return "#00d4ff";
-  if (v>=80) return "#22c55e";
-  if (v>=70) return "#eab308";
-  if (v>=55) return "#f97316";
-  return "#ef4444";
+// ── UTILS ──
+const FLAGS = {"Albania":"🇦🇱","Algeria":"🇩🇿","Andorra":"🇦🇩","Angola":"🇦🇴","Argentina":"🇦🇷","Armenia":"🇦🇲","Aruba":"🇦🇼","Australia":"🇦🇺","Austria":"🇦🇹","Azerbaijan":"🇦🇿","Bahrain":"🇧🇭","Belarus":"🇧🇾","Belgium":"🇧🇪","Belize":"🇧🇿","Bolivia":"🇧🇴","Bosnia":"🇧🇦","Botswana":"🇧🇼","Brazil":"🇧🇷","Bulgaria":"🇧🇬","Canada":"🇨🇦","Chile":"🇨🇱","China":"🇨🇳","Colombia":"🇨🇴","Costa Rica":"🇨🇷","Croatia":"🇭🇷","Cyprus":"🇨🇾","Czech Republic":"🇨🇿","Denmark":"🇩🇰","Dominican Republic":"🇩🇴","Ecuador":"🇪🇨","Egypt":"🇪🇬","El Salvador":"🇸🇻","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Estonia":"🇪🇪","Faroe Islands":"🇫🇴","Finland":"🇫🇮","France":"🇫🇷","Georgia":"🇬🇪","Germany":"🇩🇪","Ghana":"🇬🇭","Gibraltar":"🇬🇮","Greece":"🇬🇷","Guatemala":"🇬🇹","Haiti":"🇭🇹","Honduras":"🇭🇳","Hong Kong":"🇭🇰","Hungary":"🇭🇺","Iceland":"🇮🇸","India":"🇮🇳","Indonesia":"🇮🇩","Iran":"🇮🇷","Iraq":"🇮🇶","Ireland":"🇮🇪","Israel":"🇮🇱","Italy":"🇮🇹","Jamaica":"🇯🇲","Japan":"🇯🇵","Kazakhstan":"🇰🇿","Kenya":"🇰🇪","Kosovo":"🇽🇰","Latvia":"🇱🇻","Lithuania":"🇱🇹","Luxembourg":"🇱🇺","Malaysia":"🇲🇾","Mali":"🇲🇱","Malta":"🇲🇹","Mexico":"🇲🇽","Moldova":"🇲🇩","Montenegro":"🇲🇪","Morocco":"🇲🇦","N. Macedonia":"🇲🇰","Namibia":"🇳🇦","Netherlands":"🇳🇱","Nicaragua":"🇳🇮","Nigeria":"🇳🇬","Northern Ireland":"🇬🇧","Norway":"🇳🇴","Panama":"🇵🇦","Paraguay":"🇵🇾","Peru":"🇵🇪","Philippines":"🇵🇭","Poland":"🇵🇱","Portugal":"🇵🇹","Qatar":"🇶🇦","Romania":"🇷🇴","San Marino":"🇸🇲","Saudi Arabia":"🇸🇦","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Serbia":"🇷🇸","Seychelles":"🇸🇨","Singapore":"🇸🇬","Slovakia":"🇸🇰","Slovenia":"🇸🇮","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","St Kitts & Nevis":"🇰🇳","Sudan":"🇸🇩","Suriname":"🇸🇷","Sweden":"🇸🇪","Switzerland":"🇨🇭","Tanzania":"🇹🇿","Thailand":"🇹🇭","Trinidad & Tobago":"🇹🇹","Tunisia":"🇹🇳","Turkey":"🇹🇷","UAE":"🇦🇪","USA":"🇺🇸","Uganda":"🇺🇬","Ukraine":"🇺🇦","Uruguay":"🇺🇾","Uzbekistan":"🇺🇿","Venezuela":"🇻🇪","Vietnam":"🇻🇳","Wales":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","Zambia":"🇿🇲"};
+const fl = c => FLAGS[c] || "🏳️";
+function sc(v) {
+  if(v>=95) return "#d4af37";
+  if(v>=80) return "#2d9e52";
+  if(v>=70) return "#c07a00";
+  if(v>=55) return "#b85c00";
+  return "#c0392b";
 }
-function natBg(v) {
-  if (v>=90) return "rgba(0,212,255,0.15)";
-  if (v>=80) return "rgba(34,197,94,0.15)";
-  if (v>=70) return "rgba(234,179,8,0.15)";
-  return "rgba(107,114,128,0.15)";
+function nb(v) {
+  if(v>=95) return "rgba(212,175,55,0.15)";
+  if(v>=80) return "rgba(45,158,82,0.12)";
+  if(v>=70) return "rgba(192,122,0,0.1)";
+  return "rgba(136,136,128,0.1)";
 }
+function levelName(l) {
+  if(l===99||l==='99'||String(l).startsWith('99')) return 'Sin División';
+  const m = {"1ª división":"Primera División","2ª división":"Segunda División","3ª división":"Tercera División","4ª división":"Cuarta División","5ª división":"Quinta División","6ª división":"Sexta División","7ª división":"Séptima División","No profesional / Amateur":"División Amateur"};
+  return m[l] || l;
+}
+function levelBadge(numLevel) {
+  return numLevel===99 ? 'Sin Div' : `${numLevel}ª Div`;
+}
+function levelFull(numLevel) {
+  return numLevel===99 ? 'Sin División' : `${numLevel}ª División`;
+}
+function strClass(v) { return v>=95 ? 'str-elite' : ''; }
+function esc(s) { return String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+function strBucket(v) {
+  if(v>=95) return 'elite';
+  if(v>=80) return 'muy';
+  if(v>=70) return 'comp';
+  if(v>=55) return 'medio';
+  return 'debil';
+}
+function strStyle(v) { return v>=95 ? '' : `style="color:${sc(v)}"`; }
 
-// ── CLUBS ────────────────────────────────────────────────────────────────
-let clubsData = [...DATA.clubs];
-let clubsFiltered = [...clubsData];
-let clubsPage = 1;
-let clubsSort = {key:'rank', dir:1};
-const PER = 50;
+// ── CLUBS ──
+let cData = [...DATA.clubs];
+let cFilt = [...cData];
+let cPage = 1, cSort = {key:'str', dir:-1};
+let cStyle = 'b';
+const cStr = new Set();
+const CPP = 50;
 
-// Country dropdown
-const csel = document.getElementById('club-country');
-[...new Set(clubsData.map(c=>c.country))].sort().forEach(c => {
-  const o = document.createElement('option');
-  o.value = c; o.textContent = flag(c) + ' ' + c;
-  csel.appendChild(o);
+const cSel = document.getElementById('club-country');
+[...new Set(cData.map(c=>c.country))].sort().forEach(c => {
+  const o = document.createElement('option'); o.value=c; o.textContent=fl(c)+' '+c; cSel.appendChild(o);
 });
+
+function setStyle(s, btn) {
+  cStyle = s;
+  document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('wrap-b').style.display = s==='b' ? '' : 'none';
+  document.getElementById('wrap-c').style.display = s==='c' ? '' : 'none';
+  renderClubs();
+}
 
 function filterClubs() {
   const q = document.getElementById('club-search').value.toLowerCase();
   const country = document.getElementById('club-country').value;
   const level = document.getElementById('club-level').value;
-  clubsFiltered = clubsData.filter(c =>
+  cFilt = cData.filter(c =>
     (!q || c.name.toLowerCase().includes(q) || c.abbr.toLowerCase().includes(q)) &&
-    (!country || c.country === country) &&
-    (!level || c.level === level)
+    (!country || c.country===country) && (!level || c.level===level) &&
+    (cStr.size===0 || cStr.has(strBucket(c.str)))
   );
-  // Re-apply current sort
-  applyClubSort();
-  clubsPage = 1;
-  renderClubs();
+  applyCS(); cPage=1; renderClubs();
 }
 
-function applyClubSort() {
-  const {key, dir} = clubsSort;
-  clubsFiltered.sort((a, b) => {
-    let av = a[key], bv = b[key];
-    if (typeof av === 'string') av = av.toLowerCase(), bv = bv.toLowerCase();
-    return av < bv ? -dir : av > bv ? dir : 0;
-  });
+function toggleClubStr(cat, btn) {
+  if(cStr.has(cat)) cStr.delete(cat); else cStr.add(cat);
+  const on = btn.classList.toggle('active');
+  btn.setAttribute('aria-pressed', on);
+  filterClubs();
+}
+
+function applyCS() {
+  const {key,dir} = cSort;
+  cFilt.sort((a,b)=>{let av=a[key],bv=b[key]; if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();} return av<bv?-dir:av>bv?dir:0;});
 }
 
 function sortClubs(key) {
-  if (clubsSort.key === key) clubsSort.dir *= -1;
-  else { clubsSort.key = key; clubsSort.dir = (key==='str'||key==='natStr') ? -1 : 1; }
-  applyClubSort();
-  clubsPage = 1;
-  const keys = ['rank','abbr','name','country','liga','str','natStr'];
-  document.querySelectorAll('#clubs-table thead th').forEach((th, i) => {
-    th.classList.toggle('sorted', keys[i]===key);
-    th.querySelector('.sort-arrow').textContent = keys[i]===key ? (clubsSort.dir>0?'↑':'↓') : '↕';
+  if(cSort.key===key) cSort.dir*=-1;
+  else { cSort.key=key; cSort.dir=(key==='str'||key==='natStr')?-1:1; }
+  applyCS(); cPage=1;
+  ['rank','abbr','name','country','liga','str','natStr'].forEach((k,i)=>{
+    const th = document.querySelectorAll('#style-b thead th')[i];
+    if(!th) return;
+    th.classList.toggle('sorted',k===key);
+    const sa=th.querySelector('.sa'); if(sa) sa.textContent=k===key?(cSort.dir>0?'↑':'↓'):'↕';
   });
   renderClubs();
 }
 
-function renderClubs() {
-  const total = clubsFiltered.length;
-  const start = (clubsPage-1)*PER;
-  const page = clubsFiltered.slice(start, start+PER);
-  document.getElementById('club-count').innerHTML = `<b>${total.toLocaleString()}</b> clubes`;
-  document.getElementById('clubs-tbody').innerHTML = total === 0
-    ? '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔍</div>Sin resultados</div></td></tr>'
-    : page.map(c => `
-    <tr>
-      <td class="rank-num ${c.rank<=3?'top3':''}">${c.rank}</td>
-      <td><div class="club-abbr" style="font-size:14px">${c.abbr}</div></td>
-      <td><div class="club-name">${c.name}</div></td>
-      <td><div class="country-cell"><span class="flag">${flag(c.country)}</span><span class="country-name">${c.country}</span></div></td>
-      <td>
-        <div class="liga-name" style="cursor:pointer;color:var(--accent2)" onclick="openLigaDetail('${c.liga.replace(/'/g,"\\'")}')"> 
-          ${c.liga}
-        </div>
-        <div class="liga-level">${c.level}</div>
-      </td>
-      <td>
-        <div class="str-bar-wrap">
-          <div class="str-value" style="color:${strColor(c.str)}">${c.str}</div>
-          <div class="str-bar"><div class="str-fill" style="width:${c.str}%;background:${strColor(c.str)}"></div></div>
-        </div>
-      </td>
-      <td class="hide-mobile">
-        <span class="nat-str" style="color:${strColor(c.natStr)};background:${natBg(c.natStr)}">${c.natStr||'-'}</span>
-      </td>
-    </tr>`).join('');
-  renderPagination('clubs', total, PER, clubsPage, p => { clubsPage=p; renderClubs(); });
+function rowHTML(c) {
+  const rowCls = c.str>=95 ? 'elite-row' : c.str>=80 ? 'strong-row' : '';
+  const sc_ = strClass(c.str);
+  const ss_ = strStyle(c.str);
+  const barColor = c.str>=95 ? '#d4af37' : sc(c.str);
+  return `<tr class="${rowCls}">
+    <td class="rank-num ${c.rank<=3?'top3':''}">${c.rank}</td>
+    <td><span class="club-abbr-cell">${esc(c.abbr)}</span></td>
+    <td><span class="club-name-cell">${esc(c.name)}</span></td>
+    <td><div class="country-cell"><span class="flag">${fl(c.country)}</span><span class="country-name">${esc(c.country)}</span></div></td>
+    <td>
+      <div class="liga-link" onclick="openLigaDetail('${c.liga.replace(/'/g,"\\'")}','${c.country.replace(/'/g,"\\'")}')"> ${esc(c.liga)}</div>
+      <div class="liga-level-txt">${levelName(c.level)}</div>
+    </td>
+    <td><div class="str-wrap"><div class="str-val ${sc_}" ${ss_}>${c.str}</div><div class="str-bar"><div class="str-fill" style="width:${c.str}%;background:${barColor}"></div></div></div></td>
+    <td class="hide-mob"><span class="nat-badge" style="color:${sc(c.natStr)};background:${nb(c.natStr)}">${c.natStr||'-'}</span></td>
+  </tr>`;
 }
 
-// ── LIGAS ────────────────────────────────────────────────────────────────
-let ligasData = [...DATA.ligas];
-let ligasFiltered = [...ligasData];
-let ligasPage = 1;
-const LPER = 30;
-let ligasSortMode = 'rank';
+function cartaHTML(c) {
+  const sc_ = strClass(c.str);
+  const ss_ = strStyle(c.str);
+  const eliteCls = c.str>=95 ? 'elite-carta' : '';
+  return `<div class="club-carta ${eliteCls}" onclick="openLigaDetail('${c.liga.replace(/'/g,"\\'")}','${c.country.replace(/'/g,"\\'")}')">
+    <div class="carta-rank">${c.rank}</div>
+    <div class="carta-flag">${fl(c.country)}</div>
+    <div class="carta-info">
+      <div class="carta-name">${esc(c.abbr)}</div>
+      <div class="carta-fullname">${esc(c.name)}</div>
+      <div class="carta-sub">${esc(c.country)} · ${levelName(c.level)}</div>
+    </div>
+    <div class="carta-str ${sc_}" ${ss_}>${c.str}</div>
+  </div>`;
+}
+
+function renderClubs() {
+  const total = cFilt.length;
+  const start = (cPage-1)*CPP;
+  const page = cFilt.slice(start, start+CPP);
+  document.getElementById('club-count').innerHTML = `<b>${total.toLocaleString()}</b> clubes`;
+  const empty = '<div class="empty">Sin resultados</div>';
+  if(cStyle==='b') {
+    document.getElementById('tbody-b').innerHTML = total===0 ? `<tr><td colspan="7">${empty}</td></tr>` : page.map(c=>rowHTML(c)).join('');
+  } else {
+    document.getElementById('wrap-c').innerHTML = total===0 ? empty : page.map(cartaHTML).join('');
+  }
+  renderPag('clubs', total, CPP, cPage, p=>{cPage=p;renderClubs();});
+}
+
+// ── LIGAS ──
+let lData = [...DATA.ligas];
+let lFilt = [...lData];
+let lPage = 1, lSort = 'rank';
+const LPP = 30;
 
 function filterLigas() {
   const q = document.getElementById('liga-search').value.toLowerCase();
   const level = document.getElementById('liga-level').value;
-  ligasFiltered = ligasData.filter(l =>
+  lFilt = lData.filter(l =>
     (!q || l.country.toLowerCase().includes(q) || l.liga.toLowerCase().includes(q) || l.best.toLowerCase().includes(q)) &&
     (!level || (level==='4' ? l.level>=4 : l.level==level))
   );
-  applyLigaSort();
-  ligasPage = 1;
-  renderLigas();
+  applyLS(); lPage=1; renderLigas();
 }
-
-function sortLigas(mode, btn) {
-  ligasSortMode = mode;
-  document.querySelectorAll('.sort-chip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  applyLigaSort();
-  ligasPage = 1;
-  renderLigas();
+function sortLigas(m, btn) {
+  lSort=m;
+  document.querySelectorAll('.sort-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  applyLS(); lPage=1; renderLigas();
 }
-
-function applyLigaSort() {
-  const mode = ligasSortMode;
-  ligasFiltered.sort((a, b) => {
-    if (mode === 'rank') return a.rank - b.rank;
-    if (mode === 'avg_desc') return b.avg - a.avg;
-    if (mode === 'avg_asc') return a.avg - b.avg;
-    if (mode === 'max_desc') return b.max - a.max;
-    if (mode === 'country') return a.country.localeCompare(b.country);
-    if (mode === 'clubs') return b.clubs - a.clubs;
+function applyLS() {
+  if(lSort==='shuffle') { for(let i=lFilt.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[lFilt[i],lFilt[j]]=[lFilt[j],lFilt[i]];} return; }
+  lFilt.sort((a,b)=>{
+    if(lSort==='rank') return a.rank-b.rank;
+    if(lSort==='avg_desc') return b.avg-a.avg;
+    if(lSort==='avg_asc') return a.avg-b.avg;
+    if(lSort==='max_desc') return b.max-a.max;
+    if(lSort==='country') return a.country.localeCompare(b.country);
+    if(lSort==='clubs') return b.clubs-a.clubs;
+    return 0;
   });
 }
-
 function renderLigas() {
-  const total = ligasFiltered.length;
-  const start = (ligasPage-1)*LPER;
-  const page = ligasFiltered.slice(start, start+LPER);
-  document.getElementById('liga-count').innerHTML = `<b>${total.toLocaleString()}</b> ligas`;
-  document.getElementById('ligas-grid').innerHTML = total === 0
-    ? '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div>Sin resultados</div>'
-    : page.map(l => `
-    <div class="liga-row">
-      <div class="liga-rank ${l.rank<=3?'top':''}">${l.rank}</div>
+  const total = lFilt.length;
+  const start = (lPage-1)*LPP;
+  const page = lFilt.slice(start, start+LPP);
+  document.getElementById('liga-count').innerHTML = `<b>${total}</b> ligas`;
+  const grid = document.getElementById('ligas-grid');
+  if(total===0) { grid.innerHTML='<div class="empty">Sin resultados</div>'; renderPag('ligas',0,LPP,lPage,p=>{lPage=p;renderLigas();}); return; }
+  grid.innerHTML = page.map(l => {
+    const lc = l.level===1?"#1a7a3c":l.level===2?"#2d9e52":l.level===3?"#c07a00":"#888880";
+    const lb = l.level===1?"rgba(26,122,60,0.1)":l.level===2?"rgba(45,158,82,0.1)":l.level===3?"rgba(192,122,0,0.1)":"rgba(136,136,128,0.1)";
+    return `<div class="liga-row" onclick="openLigaDetail('${l.liga.replace(/'/g,"\\'")}','${l.country.replace(/'/g,"\\'")}')">
+      <div class="liga-rank ${l.rank<=10?'top':''}">${l.rank}</div>
       <div class="liga-info">
-        <div class="name">${l.country} <span class="level-badge" style="background:rgba(34,197,94,0.15);color:var(--accent)">${l.level}ª</span></div>
-        <div class="sub">${l.liga}</div>
+        <div class="name">${fl(l.country)} ${l.country} <span class="liga-badge" style="color:${lc};background:${lb}">${levelBadge(l.level)}</span></div>
+        <div class="sub">${l.liga} · ${l.clubs} clubes · Mejor: <b>${l.best}</b> · Promedio: ${l.avg}</div>
       </div>
-      <div class="stat-col"><div class="val" style="color:var(--accent)">${l.clubs}</div><div class="lbl">Clubes</div></div>
-      <div class="stat-col"><div class="val" style="color:${strColor(l.avg)}">${l.avg.toFixed(1)}</div><div class="lbl">Promedio</div></div>
-    </div>`).join('');
-  renderPagination('ligas', total, LPER, ligasPage, p => { ligasPage=p; renderLigas(); });
+      <div class="stat-mini"><div class="v" style="color:${sc(l.max)}">${l.max}</div><div class="l">Máx.</div></div>
+      <div class="stat-mini"><div class="v" style="color:${sc(l.min)}">${l.min}</div><div class="l">Mín.</div></div>
+    </div>`;
+  }).join('');
+  renderPag('ligas', total, LPP, lPage, p=>{lPage=p;renderLigas();});
 }
 
-// ── SELECCIONES ────────────────────────────────────────────────────────────
-let selsData = [...DATA.sels];
-let selsFiltered = [...selsData];
-let selsSortMode = 'rank';
+// ── SELECCIONES ──
+let sData = [...DATA.selecciones];
+let sFilt = [...sData];
+let sSort = 'str_desc';
+const sStr = new Set();
 
 function filterSels() {
   const q = document.getElementById('sel-search').value.toLowerCase();
-  const continent = document.getElementById('sel-continent').value;
-  selsFiltered = selsData.filter(s =>
-    (!q || s.country.toLowerCase().includes(q)) &&
-    (!continent || s.continent === continent)
-  );
-  applySelSort();
-  renderSels();
+  const cont = document.getElementById('sel-continent').value;
+  sFilt = sData.filter(s => (!q||s.country.toLowerCase().includes(q)) && (!cont||s.continent===cont) && (sStr.size===0 || sStr.has(strBucket(s.str))));
+  applySSS(); renderSels();
+}
+function toggleSelStr(cat, btn) {
+  if(sStr.has(cat)) sStr.delete(cat); else sStr.add(cat);
+  const on = btn.classList.toggle('active');
+  btn.setAttribute('aria-pressed', on);
+  filterSels();
 }
 
-function sortSels(mode, btn) {
-  selsSortMode = mode;
-  document.querySelectorAll('.sel-sort-chip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  applySelSort();
-  renderSels();
-}
+// ── FEEDBACK ──
+// Pegá acá tu access key de Web3Forms (https://web3forms.com → gratis, sin cuenta).
+// Mientras esté vacío, el formulario abre el mail del usuario como respaldo.
+const WEB3FORMS_KEY = "7b557171-cd6a-4ac0-8ea4-7f8510063977";
+const FEEDBACK_EMAIL = "luchoguerra33@gmail.com"; // respaldo mailto
 
-function applySelSort() {
-  const mode = selsSortMode;
-  selsFiltered.sort((a, b) => {
-    if (mode === 'rank') return a.rank - b.rank;
-    if (mode === 'str_desc') return b.str - a.str;
-    if (mode === 'str_asc') return a.str - b.str;
-    if (mode === 'country') return a.country.localeCompare(b.country);
+async function submitFeedback(e) {
+  e.preventDefault();
+  const status = document.getElementById('fb-status');
+  const btn = document.getElementById('fb-submit');
+  const name = document.getElementById('fb-name').value.trim();
+  const email = document.getElementById('fb-email').value.trim();
+  const type = document.getElementById('fb-type').value;
+  const msg = document.getElementById('fb-msg').value.trim();
+  status.className = 'fb-status';
+  if(!msg) { status.textContent = 'Escribí un mensaje antes de enviar.'; status.classList.add('err'); return; }
+
+  // Sin access key configurada → respaldo por mail
+  if(!WEB3FORMS_KEY) {
+    const subject = encodeURIComponent(`[NSS Finder] ${type}` + (name ? ` — ${name}` : ''));
+    const body = encodeURIComponent(`${msg}\n\n---\nTipo: ${type}\nNombre: ${name || '-'}\nEmail: ${email || '-'}`);
+    window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+    status.textContent = 'Se abrió tu app de correo para enviar el mensaje. ¡Gracias!';
+    status.classList.add('ok');
+    return;
+  }
+
+  btn.disabled = true; status.textContent = 'Enviando...';
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_KEY,
+        subject: `[NSS Finder] ${type}` + (name ? ` — ${name}` : ''),
+        from_name: name || 'Anónimo',
+        email: email || 'no-reply@nssfinder.local',
+        tipo: type,
+        nombre: name || '-',
+        message: msg
+      })
+    });
+    const data = await res.json();
+    if(data.success) {
+      status.textContent = '¡Mensaje enviado! Muchas gracias por tu aporte. 🙌';
+      status.classList.add('ok');
+      document.getElementById('fb-form').reset();
+    } else {
+      throw new Error(data.message || 'Error');
+    }
+  } catch(err) {
+    status.textContent = 'No se pudo enviar. Probá de nuevo en un rato.';
+    status.classList.add('err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+function sortSels(m, btn) {
+  sSort=m;
+  document.querySelectorAll('.sel-sort-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  applySSS(); renderSels();
+}
+function applySSS() {
+  if(sSort==='shuffle') { for(let i=sFilt.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[sFilt[i],sFilt[j]]=[sFilt[j],sFilt[i]];} return; }
+  sFilt.sort((a,b)=>{
+    if(sSort==='str_desc') return b.str-a.str;
+    if(sSort==='str_asc') return a.str-b.str;
+    if(sSort==='country') return a.country.localeCompare(b.country);
+    return 0;
   });
 }
-
 function renderSels() {
-  const total = selsFiltered.length;
-  document.getElementById('sel-count').innerHTML = `<b>${total.toLocaleString()}</b> selecciones`;
-  document.getElementById('sels-grid').innerHTML = total === 0
-    ? '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div>Sin resultados</div>'
-    : selsFiltered.map(s => `
-    <div class="sel-card">
-      <div class="sel-rank">${s.rank}</div>
-      <div class="sel-flag">${flag(s.country)}</div>
-      <div class="sel-info">
-        <div class="country">${s.country}</div>
-        <div class="continent">${s.continent}</div>
-      </div>
-      <div class="sel-str" style="color:${strColor(s.str)}">${s.str}</div>
-    </div>`).join('');
+  const total = sFilt.length;
+  document.getElementById('sel-count').innerHTML = `<b>${total}</b> selecciones`;
+  document.getElementById('sels-grid').innerHTML = total===0
+    ? '<div class="empty" style="grid-column:1/-1">Sin resultados</div>'
+    : sFilt.map((s,i) => `<div class="sel-card" onclick="openSelDetail('${s.country.replace(/'/g,"\\'")}')">
+        <div class="sel-rank">${i+1}</div>
+        <div class="sel-flag">${fl(s.country)}</div>
+        <div class="sel-info"><div class="country">${esc(s.country)}</div><div class="continent">${esc(s.continent)}</div></div>
+        <div class="sel-str-val" style="color:${sc(s.str)}">${s.str}</div>
+      </div>`).join('');
 }
 
-// ── PAGINATION ────────────────────────────────────────────────────────────
-function renderPagination(key, total, perPage, currentPage, onPageChange) {
-  const numPages = Math.ceil(total / perPage);
-  if (numPages <= 1) { document.getElementById(key + '-pagination').innerHTML = ''; return; }
-  let html = '';
-  if (currentPage > 1) html += `<button class="page-btn" onclick="${onPageChange.toString().match(/\w+\s*=>/)[0].trim()}(1)">Primera</button>`;
-  for (let i = Math.max(1, currentPage-2); i <= Math.min(numPages, currentPage+2); i++) {
-    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="${onPageChange.toString().match(/\w+\s*=>/)[0].trim()}(${i})">${i}</button>`;
-  }
-  if (currentPage < numPages) html += `<button class="page-btn" onclick="${onPageChange.toString().match(/\w+\s*=>/)[0].trim()}(${numPages})">Última</button>`;
-  document.getElementById(key + '-pagination').innerHTML = html;
+// ── DETAIL ──
+function openLigaDetail(ligaId, country) {
+  const clubs = DATA.clubs.filter(c=>c.liga===ligaId&&c.country===country).sort((a,b)=>b.str-a.str);
+  const liga = DATA.ligas.find(l=>l.liga===ligaId&&l.country===country);
+  const avg = liga ? liga.avg : (clubs.reduce((s,c)=>s+c.str,0)/clubs.length).toFixed(1);
+  document.getElementById('detail-title').innerHTML = `${fl(country)} ${esc(ligaId)}`;
+  document.getElementById('detail-sub').textContent = country + (liga ? ` · ${levelFull(liga.level)} · ${liga.clubs} clubes` : '');
+  document.getElementById('detail-stats').innerHTML = `
+    <div class="detail-stat"><div class="val" style="color:${sc(clubs[0]?.str||0)}">${clubs[0]?.str||'-'}</div><div class="lbl">Fuerza máx.</div></div>
+    <div class="detail-stat"><div class="val" style="color:${sc(clubs[clubs.length-1]?.str||0)}">${clubs[clubs.length-1]?.str||'-'}</div><div class="lbl">Fuerza mín.</div></div>
+    <div class="detail-stat"><div class="val" style="color:${sc(avg)}">${avg}</div><div class="lbl">Promedio</div></div>
+    <div class="detail-stat"><div class="val" style="color:#1a7a3c">${clubs.length}</div><div class="lbl">Clubes</div></div>`;
+  document.getElementById('detail-thead').innerHTML = '<th>#</th><th>Sigla</th><th>Club</th><th>Fuerza</th>';
+  document.getElementById('detail-tbody').innerHTML = clubs.map((c,i)=>`
+    <tr><td class="rank-num">${i+1}</td>
+    <td><span class="club-abbr-cell">${esc(c.abbr)}</span></td>
+    <td><span class="club-name-cell">${esc(c.name)}</span></td>
+    <td><div class="str-wrap"><div class="str-val" style="color:${sc(c.str)}">${c.str}</div><div class="str-bar"><div class="str-fill" style="width:${c.str}%;background:${sc(c.str)}"></div></div></div></td>
+    </tr>`).join('');
+  document.getElementById('detail-overlay').style.display='flex';
+  document.body.style.overflow='hidden';
 }
 
-// ── TAB SWITCHING ────────────────────────────────────────────────────────
+function openSelDetail(country) {
+  const sel = DATA.selecciones.find(s=>s.country===country);
+  const ligas = DATA.ligas.filter(l=>l.country===country).sort((a,b)=>a.level-b.level);
+  document.getElementById('detail-title').innerHTML = `${fl(country)} ${esc(country)}`;
+  document.getElementById('detail-sub').textContent = sel ? `Selección Nacional · ${sel.continent}` : country;
+  document.getElementById('detail-stats').innerHTML = `
+    <div class="detail-stat"><div class="val" style="color:${sc(sel?.str||0)}">${sel?.str||'-'}</div><div class="lbl">Fuerza Selección</div></div>
+    <div class="detail-stat"><div class="val" style="color:#1a7a3c">${ligas.length}</div><div class="lbl">Ligas activas</div></div>
+    <div class="detail-stat"><div class="val" style="color:${sc(sel?.str||0)}">#${sel?.rank||'-'}</div><div class="lbl">Ranking</div></div>`;
+  document.getElementById('detail-thead').innerHTML = '<th>Nivel</th><th>Liga</th><th>Clubes</th><th>Máx.</th><th>Mín.</th><th>Mejor club</th>';
+  document.getElementById('detail-tbody').innerHTML = ligas.length===0
+    ? '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Sin ligas registradas</td></tr>'
+    : ligas.map(l=>`<tr style="cursor:pointer" onclick="closeDetailBtn();setTimeout(()=>openLigaDetail('${l.liga.replace(/'/g,"\\'")}','${l.country.replace(/'/g,"\\'")}'),60)">
+        <td><span class="nat-badge" style="background:rgba(26,122,60,0.1);color:#1a7a3c">${l.level===99?'SD':`${l.level}ª`}</span></td>
+        <td class="liga-link">${esc(l.liga)}</td>
+        <td style="color:var(--muted)">${l.clubs}</td>
+        <td style="color:${sc(l.max)};font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px">${l.max}</td>
+        <td style="color:${sc(l.min)};font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px">${l.min}</td>
+        <td style="font-weight:600">${esc(l.best)}</td>
+      </tr>`).join('');
+  document.getElementById('detail-overlay').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeDetail(e) { if(e.target===document.getElementById('detail-overlay')) closeDetailBtn(); }
+function closeDetailBtn() { document.getElementById('detail-overlay').style.display='none'; document.body.style.overflow=''; }
+
+// ── PAGINATION ──
+function renderPag(id, total, pp, current, fn) {
+  const pages = Math.ceil(total/pp);
+  const el = document.getElementById(`${id}-pagination`);
+  if(!el||pages<=1){if(el)el.innerHTML='';return;}
+  let html = `<button class="page-btn" onclick="(${fn.toString()})(${current-1})" ${current===1?'disabled':''}>‹</button>`;
+  const range=[];
+  for(let i=1;i<=pages;i++){if(i===1||i===pages||(i>=current-2&&i<=current+2))range.push(i);else if(range[range.length-1]!=='…')range.push('…');}
+  range.forEach(p=>{if(p==='…')html+='<span style="color:var(--muted);padding:5px 2px">…</span>';else html+=`<button class="page-btn ${p===current?'active':''}" onclick="(${fn.toString()})(${p})">${p}</button>`;});
+  html+=`<button class="page-btn" onclick="(${fn.toString()})(${current+1})" ${current===pages?'disabled':''}>›</button>`;
+  el.innerHTML=html;
+}
+
+// ── TABS ──
 function showTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.content').forEach(c => c.style.display = 'none');
-  event.target.classList.add('active');
-  document.getElementById('tab-' + tab).style.display = 'block';
-  if (tab === 'clubs') renderClubs();
-  if (tab === 'ligas') { filterLigas(); renderLigas(); }
-  if (tab === 'sels') { filterSels(); renderSels(); }
+  ['clubs','ligas','sels','shuffle','info'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===tab?'block':'none'; });
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{ const on=['clubs','ligas','sels','shuffle','info'][i]===tab; b.classList.toggle('active',on); b.setAttribute('aria-selected',on); });
 }
 
-// ── DETAIL PANEL ────────────────────────────────────────────────────────
-function closeDetail(e) {
-  if (e.target === e.currentTarget) document.getElementById('detail-overlay').style.display = 'none';
+// ── SHUFFLE TAB ──
+const CONTINENTS_ES = {"Europe":"Europa","South America":"Sudamérica","North America":"América del Norte","Africa":"África","Asia":"Asia","Oceania":"Oceanía"};
+function doShuffleClub() {
+  const c = DATA.clubs[Math.floor(Math.random()*DATA.clubs.length)];
+  const el = document.getElementById('shuffle-club-result');
+  const sc_ = strClass(c.str);
+  const ss_ = strStyle(c.str);
+  el.classList.remove('visible');
+  el.innerHTML = `
+    <div class="sr-name ${sc_}" ${ss_}>${esc(c.abbr)}</div>
+    <div class="sr-meta">
+      <strong>${esc(c.name)}</strong><br>
+      ${fl(c.country)} ${esc(c.country)} · ${levelName(c.level)}<br>
+      Liga: <strong>${esc(c.liga)}</strong>
+    </div>
+    <div class="sr-str ${sc_}" ${ss_}>${c.str}</div>
+    <div class="sr-str-lbl">Fuerza</div>`;
+  void el.offsetHeight;
+  el.classList.add('visible');
 }
-function closeDetailBtn() { document.getElementById('detail-overlay').style.display = 'none'; }
-function openLigaDetail(liga) {
-  alert('Liga: ' + liga);
+function doShuffleSel() {
+  const s = DATA.selecciones[Math.floor(Math.random()*DATA.selecciones.length)];
+  const el = document.getElementById('shuffle-sel-result');
+  const sc_ = strClass(s.str);
+  const ss_ = strStyle(s.str);
+  el.classList.remove('visible');
+  el.innerHTML = `
+    <div class="sr-name">${fl(s.country)} ${esc(s.country)}</div>
+    <div class="sr-meta">
+      <strong>${esc(CONTINENTS_ES[s.continent]||s.continent)}</strong>
+    </div>
+    <div class="sr-str ${sc_}" ${ss_}>${s.str}</div>
+    <div class="sr-str-lbl">Fuerza</div>`;
+  void el.offsetHeight;
+  el.classList.add('visible');
 }
 
-// Initial render
-renderClubs();
-filterLigas();
-renderLigas();
-filterSels();
-renderSels();
+// ── THEME ──
+const SVG_SUN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+const SVG_MOON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  setTheme(isDark ? 'light' : 'dark');
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('nss-theme', theme);
+  const btn = document.getElementById('theme-toggle');
+  if(btn) btn.innerHTML = theme==='dark' ? SVG_SUN : SVG_MOON;
+}
+
+// ── INIT ──
+filterClubs(); filterLigas(); filterSels();
+const _savedTheme = localStorage.getItem('nss-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+setTheme(_savedTheme);
 </script>
-
 </body>
 </html>
